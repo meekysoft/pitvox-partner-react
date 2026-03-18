@@ -192,6 +192,69 @@ import {
 **`useCompetitionEntryList(competitionId)`** — Registered drivers.
 ```
 
+## Driver Dashboard
+
+### Drop-in (recommended)
+
+One component gives you a complete driver dashboard with profile, stats cards, and current records:
+
+```jsx
+import { DriverDashboard } from '@pitvox/partner-react'
+import '@pitvox/partner-react/styles.css'
+
+function DashboardPage() {
+  return (
+    <DriverDashboard
+      steamId={user.steamId}
+      avatarUrl={user.avatarUrl}
+      memberSince={user.createdAt}
+    />
+  )
+}
+```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `steamId` | `string` | — | Driver's Steam ID (required) |
+| `avatarUrl` | `string` | — | Avatar URL from your auth provider |
+| `memberSince` | `string` | — | ISO date for "Racing since" display |
+| `className` | `string` | — | Additional class on root container |
+
+**Displays:**
+- Driver profile (avatar, name, racing since)
+- Stats cards: total laps, cars driven, tracks driven, records held, best ranking, driver rating
+- Current records table with track, car, lap time, and game badge
+
+### Layer components
+
+For more control, use the individual components directly:
+
+```jsx
+import { DriverProfile, StatsCards, RecordsTable } from '@pitvox/partner-react'
+import '@pitvox/partner-react/styles.css'
+```
+
+- **`<DriverProfile>`** — Avatar, driver name, and "Racing since" date
+- **`<StatsCards>`** — Grid of stat cards (accepts `stats` from `useDriverStats` and `rating` from `useDriverRating`)
+- **`<RecordsTable>`** — Table of current records held
+
+### Hooks only
+
+For fully custom UIs, use the data hooks directly:
+
+```jsx
+import { useDriverStats, useDriverRating } from '@pitvox/partner-react'
+```
+
+**`useDriverStats(steamId)`** — Fetch driver stats, records, and ranking from CDN.
+- Shares the same query cache as `useDriverLaps` (same CDN file)
+- Returns `{ data: { driverName, lapCount, trackBreakdown, carBreakdown, recordsHeld, currentRecords, bestRanking, bestRankingTrackId, bestRankingLayout, bestRankingCarId }, isLoading, error }`
+
+**`useDriverRating(steamId)`** — Fetch driver's rating from the partner ratings file.
+- Returns `{ data: { rating, rank, totalDrivers, comboCount, distinctCars, combos }, isLoading, error }`
+
 ## Registration
 
 ```jsx
@@ -250,6 +313,7 @@ The SDK reads pre-computed JSON from the PitVox CDN. No API key is needed for re
 | Standings | `competitions/{slug}/{id}/standings.json` |
 | Round results | `competitions/{slug}/{id}/rounds/{n}.json` |
 | Entry list | `competitions/{slug}/{id}/entrylist.json` |
+| Driver ratings | `leaderboards/partners/{slug}/ratings.json` |
 
 ## Local development
 
