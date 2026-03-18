@@ -1,7 +1,7 @@
 {
   "name": "@pitvox/partner-react",
   "version": "0.1.0",
-  "description": "React hooks and headless components for PitVox partner websites",
+  "description": "React hooks, components, and drop-in leaderboard + competition experiences for PitVox partner websites",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -41,8 +41,9 @@
     "hooks"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/meekysoft/pitvox-partner-react#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pitvox/partner-react.git"
+    "url": "https://github.com/meekysoft/pitvox-partner-react.git"
   }
 }
