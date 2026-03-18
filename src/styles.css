@@ -1,0 +1,1139 @@
+/*
+ * @pitvox/partner-react — default dark theme.
+ *
+ * Import this stylesheet in your app:
+ *   import '@pitvox/partner-react/styles.css'
+ *
+ * All classes are prefixed with `pvx-` to avoid collisions.
+ * Override any class in your own CSS to customise.
+ */
+
+/* ─── CSS custom properties (override these for theming) ─────── */
+
+:root {
+  --pvx-bg: #111827;
+  --pvx-bg-card: #111827;
+  --pvx-bg-card-header: transparent;
+  --pvx-bg-hover: rgba(31, 41, 55, 0.5);
+  --pvx-bg-podium: rgba(120, 53, 15, 0.1);
+  --pvx-bg-personal-best: rgba(120, 53, 15, 0.1);
+  --pvx-bg-invalid: rgba(127, 29, 29, 0.1);
+
+  --pvx-border: #1f2937;
+  --pvx-border-header: #1f2937;
+
+  --pvx-text: #d1d5db;
+  --pvx-text-primary: #ffffff;
+  --pvx-text-muted: #6b7280;
+  --pvx-text-dimmed: #374151;
+
+  --pvx-accent: #6366f1;
+  --pvx-accent-hover: #818cf8;
+  --pvx-sector-best: #c084fc;
+
+  --pvx-rank-gold: #facc15;
+  --pvx-rank-silver: #9ca3af;
+  --pvx-rank-bronze: #f59e0b;
+
+  --pvx-valid: #4ade80;
+  --pvx-invalid: #f87171;
+
+  --pvx-tag-bg: #1f2937;
+  --pvx-tag-text: #9ca3af;
+  --pvx-tag-active-bg: var(--pvx-accent);
+  --pvx-tag-active-text: #ffffff;
+
+  --pvx-radius: 0.75rem;
+  --pvx-radius-sm: 0.5rem;
+  --pvx-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+/* ─── Explorer layout ────────────────────────────────────────── */
+
+.pvx-leaderboard-explorer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pvx-explorer-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pvx-explorer-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--pvx-text-primary);
+  margin: 0;
+}
+
+.pvx-explorer-stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-explorer-stats-sep {
+  color: var(--pvx-text-dimmed);
+}
+
+.pvx-explorer-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pvx-game-tabs {
+  display: flex;
+  border-radius: var(--pvx-radius-sm);
+  background: var(--pvx-tag-bg);
+  padding: 0.125rem;
+}
+
+.pvx-game-tab {
+  padding: 0.375rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 150ms;
+  background: transparent;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-game-tab:hover {
+  color: var(--pvx-text-primary);
+}
+
+.pvx-game-tab--active {
+  background: var(--pvx-accent);
+  color: #fff;
+}
+
+.pvx-version-select {
+  font-size: 0.875rem;
+  padding: 0.375rem 2rem 0.375rem 0.75rem;
+  border-radius: var(--pvx-radius-sm);
+  background: var(--pvx-tag-bg);
+  color: var(--pvx-text);
+  border: none;
+  cursor: pointer;
+}
+
+.pvx-data-timestamp {
+  font-size: 0.75rem;
+  color: var(--pvx-text-dimmed);
+  text-align: right;
+  margin: 0;
+}
+
+/* ─── Card ───────────────────────────────────────────────────── */
+
+.pvx-card {
+  border-radius: var(--pvx-radius);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-bg-card);
+  overflow: hidden;
+}
+
+.pvx-card-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--pvx-border-header);
+}
+
+.pvx-card-header--split {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--pvx-border-header);
+}
+
+.pvx-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pvx-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--pvx-text-primary);
+  margin: 0;
+}
+
+/* ─── Table ──────────────────────────────────────────────────── */
+
+.pvx-table-scroll {
+  overflow-x: auto;
+}
+
+.pvx-table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.pvx-thead-row {
+  border-bottom: 1px solid var(--pvx-border);
+}
+
+.pvx-th {
+  padding: 0.625rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pvx-text-muted);
+  white-space: nowrap;
+  text-align: left;
+}
+
+.pvx-th--sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.pvx-th--sortable:hover {
+  color: var(--pvx-text);
+}
+
+.pvx-th--narrow {
+  width: 4rem;
+}
+
+.pvx-th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pvx-tbody > tr + tr {
+  border-top: 1px solid rgba(31, 41, 55, 0.5);
+}
+
+.pvx-row {
+  transition: background-color 150ms;
+}
+
+.pvx-row--clickable {
+  cursor: pointer;
+}
+
+.pvx-row--clickable:hover {
+  background: var(--pvx-bg-hover);
+}
+
+.pvx-row--podium {
+  background: var(--pvx-bg-podium);
+}
+
+.pvx-row--personal-best {
+  background: var(--pvx-bg-personal-best);
+}
+
+.pvx-row--invalid {
+  opacity: 0.6;
+  background: var(--pvx-bg-invalid);
+}
+
+.pvx-td {
+  padding: 0.625rem 0.75rem;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: var(--pvx-text);
+}
+
+.pvx-td--primary {
+  font-weight: 500;
+  color: var(--pvx-text-primary);
+}
+
+.pvx-td--mono {
+  font-family: var(--pvx-font-mono);
+}
+
+.pvx-td--sector {
+  font-size: 0.8125rem;
+}
+
+.pvx-td--best-sector {
+  color: var(--pvx-sector-best);
+  font-weight: 600;
+}
+
+.pvx-td--center {
+  text-align: center;
+}
+
+.pvx-td--muted {
+  color: var(--pvx-text-muted);
+}
+
+/* ─── Responsive column hiding ───────────────────────────────── */
+
+@media (max-width: 639px) {
+  .pvx-hidden-below-sm { display: none; }
+}
+@media (max-width: 767px) {
+  .pvx-hidden-below-md { display: none; }
+}
+@media (max-width: 1023px) {
+  .pvx-hidden-below-lg { display: none; }
+}
+@media (max-width: 1279px) {
+  .pvx-hidden-below-xl { display: none; }
+}
+
+/* ─── Sort icon ──────────────────────────────────────────────── */
+
+.pvx-sort-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex-shrink: 0;
+}
+
+.pvx-sort-icon--inactive {
+  opacity: 0.4;
+}
+
+/* ─── Driver cell ────────────────────────────────────────────── */
+
+.pvx-driver {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pvx-driver-avatar {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.pvx-driver-avatar--lg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.pvx-driver-avatar--placeholder {
+  display: inline-block;
+  background: #374151;
+}
+
+.pvx-driver-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Rank badge ─────────────────────────────────────────────── */
+
+.pvx-rank {
+  font-weight: 700;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-rank--gold { color: var(--pvx-rank-gold); }
+.pvx-rank--silver { color: var(--pvx-rank-silver); }
+.pvx-rank--bronze { color: var(--pvx-rank-bronze); }
+
+/* ─── Tag filter bar ─────────────────────────────────────────── */
+
+.pvx-tag-bar {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--pvx-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.pvx-tag {
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 150ms;
+  background: var(--pvx-tag-bg);
+  color: var(--pvx-tag-text);
+}
+
+.pvx-tag:hover {
+  background: #374151;
+}
+
+.pvx-tag--active {
+  background: var(--pvx-tag-active-bg);
+  color: var(--pvx-tag-active-text);
+}
+
+.pvx-tag-separator {
+  width: 1px;
+  height: 1.25rem;
+  background: #374151;
+  margin: 0 0.125rem;
+}
+
+/* ─── Breadcrumb ─────────────────────────────────────────────── */
+
+.pvx-breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.pvx-breadcrumb-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pvx-breadcrumb-item {
+  display: flex;
+  align-items: center;
+}
+
+.pvx-breadcrumb-chevron {
+  width: 1rem;
+  height: 1rem;
+  color: var(--pvx-text-dimmed);
+  margin: 0 0.25rem;
+  flex-shrink: 0;
+}
+
+.pvx-breadcrumb-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--pvx-text-muted);
+  transition: color 150ms;
+}
+
+.pvx-breadcrumb-link:hover {
+  color: var(--pvx-accent-hover);
+}
+
+.pvx-breadcrumb-current {
+  font-weight: 500;
+  color: var(--pvx-text-primary);
+}
+
+/* ─── Checkbox ───────────────────────────────────────────────── */
+
+.pvx-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--pvx-text);
+}
+
+.pvx-checkbox {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  accent-color: var(--pvx-accent);
+}
+
+/* ─── Icons ──────────────────────────────────────────────────── */
+
+.pvx-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.pvx-icon--valid { color: var(--pvx-valid); }
+.pvx-icon--invalid { color: var(--pvx-invalid); }
+
+/* ─── Empty & loading states ─────────────────────────────────── */
+
+.pvx-empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-empty-icon {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+  opacity: 0.5;
+}
+
+.pvx-loading {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--pvx-text-muted);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Competition Components
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Competition Explorer layout ───────────────────────────────── */
+
+.pvx-comp-explorer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ─── Competition Cards (Layer 1) ───────────────────────────────── */
+
+.pvx-comp-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .pvx-comp-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .pvx-comp-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.pvx-comp-card {
+  border-radius: var(--pvx-radius);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-bg-card);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 200ms, box-shadow 200ms;
+  display: flex;
+  flex-direction: column;
+}
+
+.pvx-comp-card:hover {
+  border-color: var(--pvx-accent);
+  box-shadow: 0 0 0 1px var(--pvx-accent);
+}
+
+.pvx-comp-card:focus-visible {
+  outline: 2px solid var(--pvx-accent);
+  outline-offset: 2px;
+}
+
+.pvx-comp-card-poster {
+  aspect-ratio: 16 / 9;
+  background: #0d1117;
+  overflow: hidden;
+}
+
+.pvx-comp-card-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pvx-comp-card-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pvx-comp-trophy-icon {
+  width: 3rem;
+  height: 3rem;
+  color: var(--pvx-text-dimmed);
+}
+
+.pvx-comp-card-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.pvx-comp-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--pvx-text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pvx-comp-card-desc {
+  font-size: 0.8125rem;
+  color: var(--pvx-text-muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pvx-comp-card-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.pvx-comp-card-schedule {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--pvx-text-muted);
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--pvx-border);
+}
+
+.pvx-comp-card-schedule-label {
+  color: var(--pvx-accent);
+  font-weight: 600;
+}
+
+.pvx-comp-card-schedule-next {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pvx-comp-card-round-count {
+  flex-shrink: 0;
+  color: var(--pvx-text-dimmed);
+}
+
+.pvx-comp-card-reg {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--pvx-border);
+}
+
+/* ─── Competition badges & pills ────────────────────────────────── */
+
+.pvx-comp-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pvx-comp-badge--championship {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
+
+.pvx-comp-badge--series {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.pvx-comp-badge--event {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.pvx-info-pill {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  background: var(--pvx-tag-bg);
+  color: var(--pvx-tag-text);
+}
+
+.pvx-info-pill--format {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+}
+
+/* ─── Registration badges ───────────────────────────────────────── */
+
+.pvx-comp-reg-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.pvx-comp-reg-badge--open {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.pvx-comp-reg-badge--closed {
+  background: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
+}
+
+.pvx-comp-reg-badge--full {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.pvx-comp-reg-count {
+  font-size: 0.75rem;
+  color: var(--pvx-text-muted);
+}
+
+/* ─── Competition detail header ─────────────────────────────────── */
+
+.pvx-comp-back-link {
+  display: inline-block;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--pvx-text-muted);
+  transition: color 150ms;
+}
+
+.pvx-comp-back-link:hover {
+  color: var(--pvx-accent-hover);
+}
+
+.pvx-comp-back-link-wrap {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.pvx-comp-detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pvx-comp-detail-desc {
+  font-size: 0.9375rem;
+  color: var(--pvx-text);
+  margin: 0;
+}
+
+.pvx-comp-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ─── Competition tabs ──────────────────────────────────────────── */
+
+.pvx-comp-tabs {
+  display: flex;
+  gap: 0.125rem;
+  border-bottom: 1px solid var(--pvx-border);
+}
+
+.pvx-comp-tab {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  color: var(--pvx-text-muted);
+  transition: color 150ms, border-color 150ms;
+  margin-bottom: -1px;
+}
+
+.pvx-comp-tab:hover {
+  color: var(--pvx-text);
+}
+
+.pvx-comp-tab--active {
+  color: var(--pvx-text-primary);
+  border-bottom-color: var(--pvx-accent);
+}
+
+/* ─── Schedule strip ────────────────────────────────────────────── */
+
+.pvx-comp-schedule {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.pvx-comp-schedule-list {
+  display: flex;
+  gap: 0.5rem;
+  min-width: min-content;
+}
+
+.pvx-comp-schedule-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--pvx-radius-sm);
+  background: var(--pvx-tag-bg);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  min-width: 7rem;
+  text-align: center;
+  border: 1px solid transparent;
+}
+
+.pvx-comp-schedule-item--next {
+  border-color: var(--pvx-accent);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.pvx-comp-schedule-item--past {
+  opacity: 0.5;
+}
+
+.pvx-comp-schedule-round {
+  font-weight: 700;
+  color: var(--pvx-accent);
+}
+
+.pvx-comp-schedule-track {
+  font-weight: 500;
+  color: var(--pvx-text-primary);
+}
+
+.pvx-comp-schedule-date {
+  color: var(--pvx-text-muted);
+}
+
+.pvx-comp-schedule-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--pvx-valid);
+}
+
+/* ─── Standings table ───────────────────────────────────────────── */
+
+.pvx-standings-subtitle {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-standings-total {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.pvx-standings-cell--podium {
+  background: var(--pvx-bg-podium);
+}
+
+.pvx-standings-round-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  line-height: 1.25;
+}
+
+.pvx-standings-round-cell--dropped {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.pvx-standings-round-pos {
+  font-size: 0.6875rem;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-standings-round-pts {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+/* ─── Nation flag ────────────────────────────────────────────────── */
+
+.pvx-nation-flag {
+  margin-right: 0.375rem;
+}
+
+/* ─── Round results ─────────────────────────────────────────────── */
+
+.pvx-round-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pvx-round-results-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pvx-round-results-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--pvx-text-primary);
+  margin: 0;
+}
+
+.pvx-round-results-date {
+  font-size: 0.8125rem;
+  color: var(--pvx-text-muted);
+  margin: 0;
+}
+
+.pvx-round-podium-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-round-podium-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ─── Session tabs ──────────────────────────────────────────────── */
+
+.pvx-session-tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--pvx-tag-bg);
+  border-radius: var(--pvx-radius-sm);
+  padding: 0.125rem;
+  width: fit-content;
+}
+
+.pvx-session-tab {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border: none;
+  cursor: pointer;
+  transition: all 150ms;
+  background: transparent;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-session-tab:hover {
+  color: var(--pvx-text-primary);
+}
+
+.pvx-session-tab--active {
+  background: var(--pvx-accent);
+  color: #fff;
+}
+
+/* ─── Session result row extras ─────────────────────────────────── */
+
+.pvx-car-number {
+  font-size: 0.75rem;
+  color: var(--pvx-text-muted);
+  margin-left: 0.375rem;
+}
+
+.pvx-penalty {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--pvx-invalid);
+  margin-left: 0.375rem;
+}
+
+.pvx-session-points {
+  font-weight: 700;
+}
+
+.pvx-points-override {
+  font-size: 0.75rem;
+  color: var(--pvx-text-muted);
+  margin-left: 0.25rem;
+}
+
+/* ─── Best lap cell with sector tooltip ─────────────────────────── */
+
+.pvx-best-lap-cell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pvx-best-lap-cell--fastest .pvx-best-lap-time {
+  color: var(--pvx-sector-best);
+  font-weight: 700;
+}
+
+.pvx-splits-tooltip-anchor {
+  position: relative;
+  display: inline-block;
+}
+
+.pvx-splits-tooltip {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 0.25rem;
+  z-index: 10;
+  padding: 0.375rem 0.625rem;
+  background: #111827;
+  border: 1px solid var(--pvx-border);
+  border-radius: var(--pvx-radius-sm);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 150ms;
+  white-space: nowrap;
+  font-size: 0.75rem;
+  font-family: var(--pvx-font-mono);
+}
+
+.pvx-splits-tooltip--above {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+}
+
+.pvx-best-lap-cell:hover .pvx-splits-tooltip {
+  opacity: 1;
+}
+
+.pvx-splits-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pvx-splits-tooltip-label {
+  color: var(--pvx-text-muted);
+}
+
+.pvx-splits-tooltip-best {
+  color: var(--pvx-sector-best);
+  font-weight: 700;
+}
+
+/* ─── Round selector pills ──────────────────────────────────────── */
+
+.pvx-comp-rounds {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pvx-comp-round-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pvx-comp-round-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--pvx-radius-sm);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-bg-card);
+  cursor: pointer;
+  transition: all 150ms;
+  font-size: 0.8125rem;
+  color: var(--pvx-text);
+}
+
+.pvx-comp-round-pill:hover {
+  border-color: var(--pvx-accent);
+}
+
+.pvx-comp-round-pill--active {
+  background: var(--pvx-accent);
+  border-color: var(--pvx-accent);
+  color: #fff;
+}
+
+.pvx-comp-round-pill-num {
+  font-weight: 700;
+}
+
+.pvx-comp-round-pill-track {
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* ─── Entry list grid ───────────────────────────────────────────── */
+
+.pvx-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.75rem;
+}
+
+.pvx-entry-card {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  border-radius: var(--pvx-radius-sm);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-bg-card);
+}
+
+.pvx-entry-avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.pvx-entry-avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #374151;
+  color: var(--pvx-text);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.pvx-entry-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--pvx-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
