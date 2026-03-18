@@ -47,6 +47,18 @@ export { RoundResults } from './components/competitions/RoundResults.jsx'
 export { EntryList } from './components/competitions/EntryList.jsx'
 export { RegisterButton } from './components/competitions/RegisterButton.jsx'
 
+// Hooks — Dashboard
+export { useDriverStats } from './hooks/useDriverStats.js'
+export { useDriverRating } from './hooks/useDriverRating.js'
+
+// Components — Dashboard (composite)
+export { DriverDashboard } from './components/dashboard/DriverDashboard.jsx'
+
+// Components — Dashboard (individual layers)
+export { DriverProfile } from './components/dashboard/DriverProfile.jsx'
+export { StatsCards } from './components/dashboard/StatsCards.jsx'
+export { RecordsTable } from './components/dashboard/RecordsTable.jsx'
+
 // Utilities
 export {
   formatLapTime,

@@ -1137,3 +1137,121 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Driver Dashboard Components
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Dashboard layout ─────────────────────────────────────────── */
+
+.pvx-dash {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ─── Driver profile ───────────────────────────────────────────── */
+
+.pvx-dash-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pvx-dash-profile-avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.pvx-dash-profile-avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #374151;
+  color: var(--pvx-text-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.pvx-dash-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.pvx-dash-profile-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--pvx-text-primary);
+  margin: 0;
+}
+
+.pvx-dash-profile-since {
+  font-size: 0.875rem;
+  color: var(--pvx-text-muted);
+  margin: 0;
+}
+
+/* ─── Stats cards ──────────────────────────────────────────────── */
+
+.pvx-dash-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.75rem;
+}
+
+.pvx-dash-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 1rem 0.75rem;
+  border-radius: var(--pvx-radius);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-bg-card);
+  text-align: center;
+}
+
+.pvx-dash-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--pvx-text-primary);
+  font-family: var(--pvx-font-mono);
+}
+
+.pvx-dash-stat-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-dash-stat-sub {
+  font-size: 0.6875rem;
+  color: var(--pvx-text-dimmed);
+}
+
+/* ─── Game badge ───────────────────────────────────────────────── */
+
+.pvx-dash-game-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.pvx-dash-game-badge--evo {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
+
+.pvx-dash-game-badge--acc {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
