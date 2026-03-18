@@ -223,9 +223,9 @@ function DashboardPage() {
 | `className` | `string` | — | Additional class on root container |
 
 **Displays:**
-- Driver profile (avatar, name, racing since)
-- Stats cards: total laps, cars driven, tracks driven, records held, best ranking, driver rating
-- Current records table with track, car, lap time, and game badge
+- Driver profile card (avatar, name, racing since)
+- Stats cards: total laps (with track breakdown tooltip), cars used (with car breakdown tooltip), driver rating
+- Current records list sorted by most recent, with track, car, lap time, and game badge
 
 ### Layer components
 
@@ -237,8 +237,8 @@ import '@pitvox/partner-react/styles.css'
 ```
 
 - **`<DriverProfile>`** — Avatar, driver name, and "Racing since" date
-- **`<StatsCards>`** — Grid of stat cards (accepts `stats` from `useDriverStats` and `rating` from `useDriverRating`)
-- **`<RecordsTable>`** — Table of current records held
+- **`<StatsCards>`** — Stats cards with icons and hover breakdown tooltips (accepts `stats` from `useDriverStats` and `rating` from `useDriverRating`)
+- **`<RecordsTable>`** — Compact records list sorted by most recent, with expand/collapse
 
 ### Hooks only
 
