@@ -17,9 +17,9 @@ import {
  * @param {(carId: string) => void} props.onCarSelect
  * @param {(layer: string) => void} props.onNavigate - Breadcrumb navigation
  */
-export function CarsTable({ entries, isLoading, track, carMetadata, getUserDisplay, onCarSelect, onNavigate }) {
+export function CarsTable({ entries, isLoading, track, carMetadata, getUserDisplay, onCarSelect, onNavigate, tags, onTagChange }) {
   const [sortConfig, onSort] = useSortConfig({ key: 'lapTimeMs', dir: 'asc' })
-  const { activeTags, toggle, clear } = useTagFilter()
+  const { activeTags, toggle, clear } = useTagFilter(tags, onTagChange)
 
   const availableTags = useMemo(() => {
     if (!entries || !carMetadata?.tags?.length) return []

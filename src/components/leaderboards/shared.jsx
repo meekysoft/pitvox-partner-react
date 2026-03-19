@@ -41,16 +41,30 @@ export function matchesTagFilter(carTags, activeTags) {
   return true
 }
 
-export function useTagFilter() {
-  const [activeTags, setActiveTags] = useState(new Set())
+export function useTagFilter(controlledTags, onTagChange) {
+  const [internalTags, setInternalTags] = useState(new Set())
+  const isControlled = controlledTags !== undefined
+
+  const activeTags = isControlled ? controlledTags : internalTags
+
   const toggle = useCallback((tag) => {
-    setActiveTags((prev) => {
-      const next = new Set(prev)
-      next.has(tag) ? next.delete(tag) : next.add(tag)
-      return next
-    })
-  }, [])
-  const clear = useCallback(() => setActiveTags(new Set()), [])
+    const next = new Set(activeTags)
+    next.has(tag) ? next.delete(tag) : next.add(tag)
+    if (isControlled && onTagChange) {
+      onTagChange(next)
+    } else {
+      setInternalTags(next)
+    }
+  }, [activeTags, isControlled, onTagChange])
+
+  const clear = useCallback(() => {
+    if (isControlled && onTagChange) {
+      onTagChange(new Set())
+    } else {
+      setInternalTags(new Set())
+    }
+  }, [isControlled, onTagChange])
+
   return { activeTags, toggle, clear }
 }
 

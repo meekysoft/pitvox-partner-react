@@ -128,6 +128,34 @@ export function formatDelta(deltaMs) {
  * @param {string} code
  * @returns {string}
  */
+/**
+ * Format a notification object into a display message.
+ *
+ * @param {object} notification - Notification from pitvox-api
+ * @param {(userId: string) => {displayName: string}} [getUserDisplay] - User lookup function
+ * @returns {string}
+ */
+export function formatNotificationMessage(notification, getUserDisplay) {
+  const { type, title, trackId, trackLayout, carId, game, data } = notification
+
+  const track = trackId ? formatTrackName(trackId, trackLayout, game) : null
+  const car = carId ? formatCarName(carId) : null
+  const combo = [track, car].filter(Boolean).join(' — ')
+
+  if (type === 'RECORD_BEATEN' && combo) {
+    const beater = data?.beatenBySteamId && getUserDisplay
+      ? getUserDisplay(data.beatenBySteamId).displayName
+      : 'Someone'
+    return `${beater} beat your record on ${combo}`
+  }
+
+  if (type === 'RECORD_SET' && combo) {
+    return `You set a new record on ${combo}`
+  }
+
+  return title || 'New notification'
+}
+
 export function formatTyreCompound(code) {
   if (!code) return 'Unknown'
   const compounds = {

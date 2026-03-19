@@ -15,9 +15,9 @@ import {
  * @param {Function} props.getUserDisplay - From useUserLookup
  * @param {(trackId: string, layout: string|null) => void} props.onTrackSelect
  */
-export function TracksTable({ tracks, isLoading, carMetadata, getUserDisplay, onTrackSelect }) {
+export function TracksTable({ tracks, isLoading, carMetadata, getUserDisplay, onTrackSelect, tags, onTagChange }) {
   const [sortConfig, onSort] = useSortConfig({ key: 'record.timestamp', dir: 'desc' })
-  const { activeTags, toggle, clear } = useTagFilter()
+  const { activeTags, toggle, clear } = useTagFilter(tags, onTagChange)
 
   const availableTags = useMemo(() => {
     if (!carMetadata?.tags?.length) return []

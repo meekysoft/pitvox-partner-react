@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { usePitVox } from '../provider.jsx'
-import { registerDriver, unregisterDriver } from '../lib/api.js'
+import { useUserLookup } from './useLeaderboards.js'
 
 /**
  * Check if the current user (via getSteamId) is registered for a competition.
@@ -28,50 +28,119 @@ export function useRegistrationStatus(competitionId) {
 
 /**
  * Register the current user for a competition.
- * Calls pitvox-api with the partner API key.
+ * Delegates to the onRegister callback provided to PitVoxPartnerProvider.
  *
  * @param {string} competitionId
  */
 export function useRegister(competitionId) {
-  const { apiUrl, apiKey, partnerSlug } = usePitVox()
+  const { onRegister, partnerSlug, getSteamId } = usePitVox()
   const queryClient = useQueryClient()
+  const getUserDisplay = useUserLookup()
 
   return useMutation({
-    mutationFn: (data) => registerDriver(apiUrl, apiKey, competitionId, data),
+    mutationFn: (driverData) => {
+      if (!onRegister) {
+        throw new Error(
+          'No onRegister callback provided to PitVoxPartnerProvider. ' +
+          'Provide onRegister for in-app registration, or use useRegistrationUrl() to link to pitvox.com.'
+        )
+      }
+      return onRegister(competitionId, driverData)
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['pitvox', 'registration', partnerSlug, competitionId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['pitvox', 'competition', partnerSlug, competitionId, 'entrylist'],
-      })
+      const steamId = getSteamId()
+
+      // Optimistically mark user as registered (CDN won't reflect the change immediately)
+      queryClient.setQueriesData(
+        { queryKey: ['pitvox', 'registration', partnerSlug, competitionId] },
+        (old) => old ? { ...old, isRegistered: true } : { isRegistered: true, entryList: null },
+      )
+
+      // Optimistically add user to entry list cache
+      if (steamId) {
+        const userInfo = getUserDisplay(steamId)
+        const newEntry = {
+          steamId,
+          displayName: userInfo.displayName,
+          avatarUrl: userInfo.avatarUrl,
+        }
+        queryClient.setQueriesData(
+          { queryKey: ['pitvox', 'competition', partnerSlug, competitionId, 'entrylist'] },
+          (old) => {
+            if (!old) return { drivers: [newEntry] }
+            const exists = old.drivers?.some((d) => d.steamId === steamId)
+            if (exists) return old
+            return { ...old, drivers: [...(old.drivers || []), newEntry] }
+          },
+        )
+      }
     },
   })
 }
 
 /**
  * Unregister the current user from a competition.
- * Calls pitvox-api with the partner API key.
+ * Delegates to the onWithdraw callback provided to PitVoxPartnerProvider.
  *
  * @param {string} competitionId
  */
 export function useWithdraw(competitionId) {
-  const { apiUrl, apiKey, partnerSlug, getSteamId } = usePitVox()
+  const { onWithdraw, partnerSlug, getSteamId } = usePitVox()
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (steamId) => {
+      if (!onWithdraw) {
+        throw new Error(
+          'No onWithdraw callback provided to PitVoxPartnerProvider. ' +
+          'Provide onWithdraw for in-app withdrawal, or use useRegistrationUrl() to link to pitvox.com.'
+        )
+      }
       const id = steamId || getSteamId()
       if (!id) throw new Error('No Steam ID available')
-      return unregisterDriver(apiUrl, apiKey, competitionId, id)
+      return onWithdraw(competitionId, id)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['pitvox', 'registration', partnerSlug, competitionId],
-      })
-      queryClient.invalidateQueries({
-        queryKey: ['pitvox', 'competition', partnerSlug, competitionId, 'entrylist'],
-      })
+      const steamId = getSteamId()
+
+      // Optimistically mark user as unregistered
+      queryClient.setQueriesData(
+        { queryKey: ['pitvox', 'registration', partnerSlug, competitionId] },
+        (old) => old ? { ...old, isRegistered: false } : { isRegistered: false, entryList: null },
+      )
+
+      // Optimistically remove user from entry list cache
+      if (steamId) {
+        queryClient.setQueriesData(
+          { queryKey: ['pitvox', 'competition', partnerSlug, competitionId, 'entrylist'] },
+          (old) => {
+            if (!old?.drivers) return old
+            return { ...old, drivers: old.drivers.filter((d) => d.steamId !== steamId) }
+          },
+        )
+      }
     },
   })
+}
+
+/**
+ * Check whether the SDK is in power mode (callbacks provided) or basic mode (link to pitvox.com).
+ *
+ * @returns {{ isPowerMode: boolean, isBasicMode: boolean }}
+ */
+export function useRegistrationMode() {
+  const { onRegister, onWithdraw } = usePitVox()
+  const isPowerMode = !!(onRegister && onWithdraw)
+  return { isPowerMode, isBasicMode: !isPowerMode }
+}
+
+/**
+ * Get the pitvox.com registration URL for a competition (basic mode).
+ *
+ * @param {string} competitionId
+ * @returns {string}
+ */
+export function useRegistrationUrl(competitionId) {
+  const { pitvoxUrl, partnerSlug } = usePitVox()
+  return `${pitvoxUrl}/p/${partnerSlug}/competitions/${competitionId}/register`
 }

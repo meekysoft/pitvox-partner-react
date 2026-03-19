@@ -1,12 +1,15 @@
 /**
- * Styled round results with session tabs and rich detail.
- * Shows session tab bar (Practice/Qualifying/Race), then a results table
- * with position, driver, car, best lap (with sector tooltip), laps, gap, and points.
+ * Round results components.
  *
- * @param {object} props
- * @param {string} props.competitionId
- * @param {number} props.roundNumber
- * @param {string} [props.className] - Additional class on root container
+ * **RoundResults** — standalone component that fetches round data by competitionId + roundNumber,
+ * then renders a header (title, date, podium) plus session tabs and results table.
+ *
+ * **RoundSessionResults** — pure presentation component that accepts round data as a prop
+ * and renders session tabs + results table. No header, no data fetching.
+ * Used by the accordion in CompetitionExplorer where the parent already has the data
+ * and displays the header in the accordion toggle.
+ *
+ * @module RoundResults
  */
 
 import { useState } from 'react'
@@ -17,14 +20,22 @@ import {
   NationFlag,
   SessionTabs,
   SESSION_ORDER,
+  PODIUM_MEDALS,
   calcFastestSplits,
   CompLoadingState,
   CompEmptyState,
 } from './shared.jsx'
 
+/**
+ * Standalone round results — fetches data and renders header + sessions.
+ *
+ * @param {object} props
+ * @param {string} props.competitionId
+ * @param {number} props.roundNumber
+ * @param {string} [props.className]
+ */
 export function RoundResults({ competitionId, roundNumber, className }) {
   const { data: round, isLoading } = useCompetitionRound(competitionId, roundNumber)
-  const [activeSession, setActiveSession] = useState(null)
 
   if (isLoading) {
     return <CompLoadingState message="Loading results..." />
@@ -35,16 +46,8 @@ export function RoundResults({ competitionId, roundNumber, className }) {
   }
 
   const sessions = round.sessions || []
-  if (!sessions.length) {
-    return <CompEmptyState message="No session data for this round." />
-  }
-
-  // Default to RACE if available, otherwise first session
-  const effectiveSession = activeSession
-    || sessions.find((s) => s.type === 'RACE')?.type
-    || sessions[0]?.type
-
-  const currentSession = sessions.find((s) => s.type === effectiveSession) || sessions[0]
+  const raceSession = sessions.find((s) => s.type === 'RACE')
+  const podium = raceSession?.results?.filter((r) => r.position <= 3).sort((a, b) => a.position - b.position)
 
   return (
     <div className={`pvx-round-results ${className || ''}`}>
@@ -61,9 +64,47 @@ export function RoundResults({ competitionId, roundNumber, className }) {
             </p>
           )}
         </div>
-        <RoundPodiumSummary sessions={sessions} />
+        {podium?.length > 0 && (
+          <div className="pvx-round-podium-summary">
+            {podium.map((r) => (
+              <span key={r.driverId} className="pvx-round-podium-item">
+                <span>{PODIUM_MEDALS[r.position - 1]}</span>
+                <span>{r.driverName}</span>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
+      <RoundSessionResults round={round} />
+    </div>
+  )
+}
+
+/**
+ * Session tabs + results table for a round. No header, no data fetching.
+ * Accepts round data directly as a prop.
+ *
+ * @param {object} props
+ * @param {object} props.round - Round data object with sessions array
+ * @param {string} [props.className]
+ */
+export function RoundSessionResults({ round, className }) {
+  const [activeSession, setActiveSession] = useState(null)
+
+  const sessions = round?.sessions || []
+  if (!sessions.length) {
+    return <CompEmptyState message="No session data for this round." />
+  }
+
+  const effectiveSession = activeSession
+    || sessions.find((s) => s.type === 'RACE')?.type
+    || sessions[0]?.type
+
+  const currentSession = sessions.find((s) => s.type === effectiveSession) || sessions[0]
+
+  return (
+    <div className={className || ''}>
       <SessionTabs
         sessions={sessions}
         activeSession={effectiveSession}
@@ -75,23 +116,7 @@ export function RoundResults({ competitionId, roundNumber, className }) {
   )
 }
 
-function RoundPodiumSummary({ sessions }) {
-  const raceSession = sessions.find((s) => s.type === 'RACE')
-  const podium = raceSession?.results?.filter((r) => r.position <= 3).sort((a, b) => a.position - b.position)
-  if (!podium?.length) return null
-
-  const MEDALS = ['\u{1F947}', '\u{1F948}', '\u{1F949}']
-  return (
-    <div className="pvx-round-podium-summary">
-      {podium.map((r) => (
-        <span key={r.driverId} className="pvx-round-podium-item">
-          <span>{MEDALS[r.position - 1]}</span>
-          <span>{r.driverName}</span>
-        </span>
-      ))}
-    </div>
-  )
-}
+// ─── Internal components ────────────────────────────────────────
 
 function SessionResultsTable({ session }) {
   const isRace = session.type === 'RACE'

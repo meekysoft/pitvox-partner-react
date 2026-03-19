@@ -1138,6 +1138,429 @@
   white-space: nowrap;
 }
 
+/* ─── Results view header ──────────────────────────────────────── */
+
+.pvx-comp-results-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pvx-comp-results-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.pvx-comp-empty-sub {
+  font-size: 0.875rem;
+  color: var(--pvx-text-dimmed);
+  margin-top: 0.5rem;
+}
+
+/* ─── Accordion (round results) ────────────────────────────────── */
+
+.pvx-comp-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.pvx-accordion-item {
+  border-radius: var(--pvx-radius-sm);
+  background: var(--pvx-tag-bg);
+  overflow: hidden;
+}
+
+.pvx-accordion-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--pvx-text);
+  transition: background 150ms;
+}
+
+.pvx-accordion-toggle:hover {
+  background: var(--pvx-bg-hover);
+}
+
+.pvx-accordion-toggle-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pvx-accordion-toggle-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.pvx-accordion-round-label {
+  font-weight: 600;
+  color: var(--pvx-text-primary);
+}
+
+.pvx-accordion-round-date {
+  font-size: 0.875rem;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-accordion-podium {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-accordion-chevron {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  color: var(--pvx-text-muted);
+  transition: transform 300ms;
+}
+
+.pvx-accordion-chevron--open {
+  transform: rotate(180deg);
+}
+
+.pvx-accordion-content {
+  padding: 0 1.25rem 1.25rem;
+}
+
+/* ─── Registration CTA ───────────────────────────────────────── */
+
+.pvx-comp-register-cta {
+  display: flex;
+  align-items: center;
+}
+
+.pvx-comp-register-link {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--pvx-radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  background: var(--pvx-accent);
+  color: #fff;
+  transition: background 150ms;
+}
+
+.pvx-comp-register-link:hover {
+  background: var(--pvx-accent-hover);
+}
+
+.pvx-comp-register-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--pvx-radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  background: var(--pvx-accent);
+  color: #fff;
+  transition: background 150ms;
+}
+
+.pvx-comp-register-btn:hover {
+  background: var(--pvx-accent-hover);
+}
+
+.pvx-comp-register-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Card registration action row ─────────────────────────────── */
+
+.pvx-comp-card-reg-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pvx-comp-card-reg-action {
+  flex-shrink: 0;
+}
+
+.pvx-comp-card-reg-btn {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--pvx-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 150ms;
+}
+
+.pvx-comp-card-reg-btn--open {
+  background: var(--pvx-accent);
+  color: #fff;
+}
+
+.pvx-comp-card-reg-btn--open:hover {
+  background: var(--pvx-accent-hover);
+}
+
+.pvx-comp-card-reg-btn--registered {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.pvx-comp-card-reg-btn--registered:hover {
+  background: rgba(34, 197, 94, 0.3);
+}
+
+.pvx-comp-card-reg-btn--closed {
+  background: rgba(107, 114, 128, 0.2);
+  color: #9ca3af;
+  cursor: default;
+}
+
+/* ─── Capacity badge ───────────────────────────────────────────── */
+
+.pvx-reg-capacity {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.pvx-reg-capacity--ok {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.pvx-reg-capacity--warning {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.pvx-reg-capacity--full {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+/* ─── Registration Panel ───────────────────────────────────────── */
+
+.pvx-reg-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pvx-reg-status-msg {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--pvx-text-muted);
+  font-size: 0.9375rem;
+}
+
+.pvx-reg-no-drivers {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  color: var(--pvx-text-muted);
+  font-size: 0.875rem;
+}
+
+/* ─── Registration Form ────────────────────────────────────────── */
+
+.pvx-reg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 32rem;
+}
+
+.pvx-reg-form-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pvx-reg-form-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--pvx-text-primary);
+  margin: 0;
+}
+
+.pvx-reg-error {
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--pvx-radius-sm);
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  font-size: 0.8125rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pvx-reg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.pvx-reg-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--pvx-text);
+}
+
+.pvx-reg-optional {
+  font-weight: 400;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-reg-input,
+.pvx-reg-select,
+.pvx-reg-textarea {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--pvx-radius-sm);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-tag-bg);
+  color: var(--pvx-text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: border-color 150ms;
+}
+
+.pvx-reg-input:focus,
+.pvx-reg-select:focus,
+.pvx-reg-textarea:focus {
+  outline: none;
+  border-color: var(--pvx-accent);
+}
+
+.pvx-reg-textarea {
+  resize: vertical;
+  min-height: 4rem;
+}
+
+.pvx-reg-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+/* ─── Unregister / Confirm ─────────────────────────────────────── */
+
+.pvx-reg-unregister-btn {
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--pvx-radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--pvx-border);
+  cursor: pointer;
+  background: transparent;
+  color: var(--pvx-text-muted);
+  transition: all 150ms;
+}
+
+.pvx-reg-unregister-btn:hover {
+  border-color: var(--pvx-invalid);
+  color: var(--pvx-invalid);
+}
+
+.pvx-reg-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--pvx-radius-sm);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pvx-reg-confirm-text {
+  font-size: 0.875rem;
+  color: var(--pvx-text);
+  margin: 0;
+}
+
+.pvx-reg-confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pvx-reg-cancel-btn {
+  padding: 0.375rem 1rem;
+  border-radius: var(--pvx-radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid var(--pvx-border);
+  cursor: pointer;
+  background: transparent;
+  color: var(--pvx-text);
+  transition: all 150ms;
+}
+
+.pvx-reg-cancel-btn:hover {
+  border-color: var(--pvx-text-muted);
+}
+
+.pvx-reg-danger-btn {
+  padding: 0.375rem 1rem;
+  border-radius: var(--pvx-radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  background: rgba(239, 68, 68, 0.8);
+  color: #fff;
+  transition: background 150ms;
+}
+
+.pvx-reg-danger-btn:hover {
+  background: rgba(239, 68, 68, 1);
+}
+
+.pvx-reg-danger-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Entry card — current user highlight ──────────────────────── */
+
+.pvx-entry-card--you {
+  border-color: var(--pvx-accent);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.pvx-entry-you {
+  font-size: 0.75rem;
+  color: var(--pvx-accent);
+  font-weight: 400;
+}
+
+/* ─── Driver list in registration panel ────────────────────────── */
+
+.pvx-reg-driver-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.75rem;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    Driver Dashboard Components
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -1148,6 +1571,24 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.pvx-dash-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.pvx-dash-row--2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .pvx-dash-row--2col {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ─── Driver profile card ──────────────────────────────────────── */
@@ -1202,7 +1643,7 @@
 .pvx-dash-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 1.5rem;
 }
 
 .pvx-dash-stat-card {
@@ -1337,6 +1778,8 @@
 .pvx-dash-records-list {
   display: flex;
   flex-direction: column;
+  max-height: 24rem;
+  overflow-y: auto;
 }
 
 .pvx-dash-record-row {
@@ -1390,23 +1833,6 @@
   color: var(--pvx-text-primary);
 }
 
-.pvx-dash-records-toggle {
-  display: block;
-  width: 100%;
-  padding: 0.625rem 1rem;
-  border: none;
-  border-top: 1px solid var(--pvx-border);
-  background: transparent;
-  color: var(--pvx-accent);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 150ms;
-}
-
-.pvx-dash-records-toggle:hover {
-  color: var(--pvx-accent-hover);
-}
 
 /* ─── Game badge ───────────────────────────────────────────────── */
 
@@ -1427,4 +1853,218 @@
 .pvx-dash-game-badge--acc {
   background: rgba(245, 158, 11, 0.2);
   color: #fbbf24;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Upcoming Events
+   ═══════════════════════════════════════════════════════════════════ */
+
+.pvx-upcoming-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.pvx-upcoming-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  gap: 1rem;
+}
+
+.pvx-upcoming-item + .pvx-upcoming-item {
+  border-top: 1px solid rgba(31, 41, 55, 0.5);
+}
+
+.pvx-upcoming-item--next {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.pvx-upcoming-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.pvx-upcoming-comp {
+  font-size: 0.75rem;
+  color: var(--pvx-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pvx-upcoming-round {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--pvx-text);
+}
+
+.pvx-upcoming-time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+  flex-shrink: 0;
+}
+
+.pvx-upcoming-date {
+  font-size: 0.8125rem;
+  color: var(--pvx-text-muted);
+  white-space: nowrap;
+}
+
+.pvx-upcoming-relative {
+  font-size: 0.75rem;
+  color: var(--pvx-accent);
+  font-weight: 500;
+}
+
+.pvx-upcoming-badge {
+  display: inline-block;
+  padding: 0.0625rem 0.375rem;
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--pvx-accent);
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Notifications
+   ═══════════════════════════════════════════════════════════════════ */
+
+.pvx-notif-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  background: var(--pvx-accent);
+  color: #fff;
+  margin-left: 0.375rem;
+}
+
+.pvx-notif-mark-all {
+  font-size: 0.75rem;
+  color: var(--pvx-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  transition: background 0.15s;
+}
+
+.pvx-notif-mark-all:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.pvx-notif-empty {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--pvx-text-dimmed);
+  font-size: 0.875rem;
+}
+
+.pvx-notif-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.pvx-notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.15s;
+}
+
+.pvx-notif-item + .pvx-notif-item {
+  border-top: 1px solid rgba(31, 41, 55, 0.5);
+}
+
+.pvx-notif-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.pvx-notif-item--unread {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.pvx-notif-item--unread:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.pvx-notif-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.pvx-notif-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.pvx-notif-icon--record {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.pvx-notif-icon--beaten {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.pvx-notif-icon--admin {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.pvx-notif-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.pvx-notif-message {
+  font-size: 0.875rem;
+  color: var(--pvx-text);
+  line-height: 1.4;
+}
+
+.pvx-notif-time {
+  font-size: 0.75rem;
+  color: var(--pvx-text-dimmed);
+}
+
+.pvx-notif-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--pvx-accent);
+  flex-shrink: 0;
+  margin-top: 0.375rem;
 }

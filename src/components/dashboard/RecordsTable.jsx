@@ -1,19 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { formatLapTime, formatCarName, formatTrackName } from '../../utils/format.js'
-
-const INITIAL_VISIBLE = 10
 
 /**
  * Compact records list — track name bold, car below, time + game badge right-aligned.
- * Sorted by most recent first. Shows first 10 with expand toggle.
+ * Sorted by most recent first. Scrollable list.
  *
  * @param {object} props
  * @param {Array} props.records - currentRecords array from useDriverStats().data
  * @param {string} [props.className]
  */
 export function RecordsTable({ records, className = '' }) {
-  const [expanded, setExpanded] = useState(false)
-
   const sorted = useMemo(() => {
     if (!records?.length) return []
     return records.slice().sort((a, b) => {
@@ -24,9 +20,6 @@ export function RecordsTable({ records, className = '' }) {
   }, [records])
 
   if (!sorted.length) return null
-
-  const visible = expanded ? sorted : sorted.slice(0, INITIAL_VISIBLE)
-  const hasMore = sorted.length > INITIAL_VISIBLE
 
   return (
     <div className={`pvx-card ${className}`}>
@@ -45,7 +38,7 @@ export function RecordsTable({ records, className = '' }) {
         </h3>
       </div>
       <div className="pvx-dash-records-list">
-        {visible.map((record, i) => (
+        {sorted.map((record, i) => (
           <div key={i} className="pvx-dash-record-row">
             <div className="pvx-dash-record-info">
               <span className="pvx-dash-record-track">
@@ -65,14 +58,6 @@ export function RecordsTable({ records, className = '' }) {
           </div>
         ))}
       </div>
-      {hasMore && (
-        <button
-          className="pvx-dash-records-toggle"
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? 'Show less' : `Show all ${sorted.length} records`}
-        </button>
-      )}
     </div>
   )
 }

@@ -6,10 +6,12 @@
  * @param {object[]} props.competitions - Competition data array (from useCompetitions)
  * @param {boolean} [props.isLoading] - Loading state
  * @param {(competitionId: string) => void} props.onSelect - Called when a competition card is clicked
+ * @param {(competitionId: string) => void} [props.onRegister] - Called when a register button is clicked (defaults to onSelect)
  * @param {string} [props.className] - Additional class on root container
  */
 
 import { usePitVox } from '../../provider.jsx'
+import { useRegistrationStatus, useRegistrationMode, useRegistrationUrl } from '../../hooks/useRegistration.js'
 import {
   TypeBadge,
   InfoPill,
@@ -18,7 +20,7 @@ import {
   CompEmptyState,
 } from './shared.jsx'
 
-export function CompetitionCards({ competitions, isLoading, onSelect, className }) {
+export function CompetitionCards({ competitions, isLoading, onSelect, onRegister, className }) {
   if (isLoading) {
     return <CompLoadingState message="Loading competitions..." />
   }
@@ -30,13 +32,13 @@ export function CompetitionCards({ competitions, isLoading, onSelect, className 
   return (
     <div className={`pvx-comp-grid ${className || ''}`}>
       {competitions.map((comp) => (
-        <CompetitionCard key={comp.id} comp={comp} onSelect={onSelect} />
+        <CompetitionCard key={comp.id} comp={comp} onSelect={onSelect} onRegister={onRegister || onSelect} />
       ))}
     </div>
   )
 }
 
-function CompetitionCard({ comp, onSelect }) {
+function CompetitionCard({ comp, onSelect, onRegister }) {
   const { cdnUrl } = usePitVox()
   const posterUrl = comp.posterCdnPath ? `${cdnUrl}/${comp.posterCdnPath}` : null
 
@@ -114,16 +116,70 @@ function CompetitionCard({ comp, onSelect }) {
           )}
         </div>
 
-        {/* Registration status */}
+        {/* Registration section with actionable button */}
         {reg && (
-          <div className="pvx-comp-card-reg">
-            <span className={`pvx-comp-reg-badge ${regOpen ? 'pvx-comp-reg-badge--open' : isFull ? 'pvx-comp-reg-badge--full' : 'pvx-comp-reg-badge--closed'}`}>
-              {regOpen ? 'Registration Open' : isFull ? 'Full' : 'Registration Closed'}
-            </span>
-            <span className="pvx-comp-reg-count">
-              {regCount}/{regMax || '\u221E'} drivers
-            </span>
-          </div>
+          <RegistrationSection
+            competitionId={comp.id}
+            regOpen={regOpen}
+            isFull={isFull}
+            deadlinePassed={deadlinePassed}
+            regCount={regCount}
+            regMax={regMax}
+            onRegister={onRegister}
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function RegistrationSection({ competitionId, regOpen, isFull, deadlinePassed, regCount, regMax, onRegister }) {
+  const { isPowerMode } = useRegistrationMode()
+  const registrationUrl = useRegistrationUrl(competitionId)
+  const { data: status } = useRegistrationStatus(competitionId)
+  const isRegistered = status?.isRegistered || false
+
+  const pct = regMax ? (regCount / regMax) * 100 : 0
+  const capacityVariant = pct >= 100 ? 'full' : pct >= 75 ? 'warning' : 'ok'
+
+  return (
+    <div className="pvx-comp-card-reg">
+      <div className="pvx-comp-card-reg-info">
+        <span className={`pvx-reg-capacity pvx-reg-capacity--${capacityVariant}`}>
+          {regCount}/{regMax || '\u221E'} drivers
+        </span>
+      </div>
+      <div className="pvx-comp-card-reg-action">
+        {isRegistered ? (
+          <button
+            className="pvx-comp-card-reg-btn pvx-comp-card-reg-btn--registered"
+            onClick={(e) => { e.stopPropagation(); onRegister(competitionId) }}
+          >
+            &#10003; Registered
+          </button>
+        ) : regOpen ? (
+          isPowerMode ? (
+            <button
+              className="pvx-comp-card-reg-btn pvx-comp-card-reg-btn--open"
+              onClick={(e) => { e.stopPropagation(); onRegister(competitionId) }}
+            >
+              Register
+            </button>
+          ) : (
+            <a
+              href={registrationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="pvx-comp-card-reg-btn pvx-comp-card-reg-btn--open"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Register
+            </a>
+          )
+        ) : (
+          <span className="pvx-comp-card-reg-btn pvx-comp-card-reg-btn--closed">
+            {isFull ? 'Full' : 'Closed'}
+          </span>
         )}
       </div>
     </div>
