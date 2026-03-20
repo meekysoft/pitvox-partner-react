@@ -22,7 +22,7 @@ import { useRegistrationStatus, useRegister, useWithdraw, useRegistrationMode, u
 import { useCompetitionEntryList } from '../../hooks/useCompetitions.js'
 import { CompLoadingState } from './shared.jsx'
 
-export function RegistrationPanel({ competitionId, registration, className }) {
+export function RegistrationPanel({ competitionId, registration, onWithdrawSuccess, className }) {
   const { getSteamId } = usePitVox()
   const { isPowerMode } = useRegistrationMode()
   const registrationUrl = useRegistrationUrl(competitionId)
@@ -36,7 +36,9 @@ export function RegistrationPanel({ competitionId, registration, className }) {
   const drivers = entryList?.drivers || entryList?.entries || []
 
   const reg = registration || {}
-  const isFull = reg.maxParticipants && (reg.currentCount || 0) >= reg.maxParticipants
+  // Use live entry list length (optimistically updated) rather than stale currentCount from CDN
+  const currentCount = drivers.length || reg.currentCount || 0
+  const isFull = reg.maxParticipants && currentCount >= reg.maxParticipants
   const deadlinePassed = reg.deadline && new Date(reg.deadline) < new Date()
   const regOpen = reg.isOpen && !deadlinePassed && !isFull
 
@@ -55,6 +57,7 @@ export function RegistrationPanel({ competitionId, registration, className }) {
           isPowerMode={isPowerMode}
           registrationUrl={registrationUrl}
           withdrawMutation={withdrawMutation}
+          onWithdrawSuccess={onWithdrawSuccess}
           registration={reg}
         />
       </div>
@@ -208,12 +211,15 @@ function RegistrationForm({ competitionId, registerMutation, registration }) {
 
 // ─── Registered View (entry list + unregister) ──────────────────────────────
 
-function RegisteredView({ competitionId, drivers, steamId, isPowerMode, registrationUrl, withdrawMutation, registration }) {
+function RegisteredView({ competitionId, drivers, steamId, isPowerMode, registrationUrl, withdrawMutation, onWithdrawSuccess, registration }) {
   const [confirmUnregister, setConfirmUnregister] = useState(false)
 
   const handleUnregister = () => {
     withdrawMutation.mutate(undefined, {
-      onSuccess: () => setConfirmUnregister(false),
+      onSuccess: () => {
+        setConfirmUnregister(false)
+        if (onWithdrawSuccess) onWithdrawSuccess()
+      },
     })
   }
 
@@ -287,23 +293,30 @@ function DriverList({ drivers, steamId }) {
     return <div className="pvx-reg-no-drivers">No drivers registered yet.</div>
   }
 
+  // Sort current user to top
+  const sorted = [...drivers].sort((a, b) => {
+    const aIsYou = steamId && a.steamId === steamId ? -1 : 0
+    const bIsYou = steamId && b.steamId === steamId ? -1 : 0
+    return aIsYou - bIsYou
+  })
+
   return (
     <div className="pvx-reg-driver-list">
-      {drivers.map((driver) => {
+      {sorted.map((driver) => {
         const isCurrentUser = steamId && (driver.steamId === steamId)
         return (
           <div
             key={driver.steamId || driver.driverId}
-            className={`pvx-entry-card ${isCurrentUser ? 'pvx-entry-card--you' : ''}`}
+            className={`pvx-reg-driver-row ${isCurrentUser ? 'pvx-reg-driver-row--you' : ''}`}
           >
             {driver.avatarUrl ? (
-              <img src={driver.avatarUrl} alt="" className="pvx-entry-avatar" />
+              <img src={driver.avatarUrl} alt="" className="pvx-reg-driver-avatar" />
             ) : (
-              <div className="pvx-entry-avatar pvx-entry-avatar--placeholder">
+              <div className="pvx-reg-driver-avatar pvx-reg-driver-avatar--placeholder">
                 {driver.displayName?.charAt(0)?.toUpperCase() || '?'}
               </div>
             )}
-            <span className="pvx-entry-name">
+            <span className="pvx-reg-driver-name">
               {driver.displayName}
               {isCurrentUser && <span className="pvx-entry-you"> (you)</span>}
             </span>

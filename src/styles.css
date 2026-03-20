@@ -1556,9 +1556,53 @@
 /* ─── Driver list in registration panel ────────────────────────── */
 
 .pvx-reg-driver-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  display: flex;
+  flex-direction: column;
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.pvx-reg-driver-row {
+  display: flex;
+  align-items: center;
   gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--pvx-border);
+}
+
+.pvx-reg-driver-row:last-child {
+  border-bottom: none;
+}
+
+.pvx-reg-driver-row--you {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.pvx-reg-driver-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.pvx-reg-driver-avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #374151;
+  color: var(--pvx-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.pvx-reg-driver-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--pvx-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
