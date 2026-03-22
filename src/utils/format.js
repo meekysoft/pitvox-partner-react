@@ -136,7 +136,8 @@ export function formatDelta(deltaMs) {
  * @returns {string}
  */
 export function formatNotificationMessage(notification, getUserDisplay) {
-  const { type, title, trackId, trackLayout, carId, game, data } = notification
+  const { type, title, trackId, trackLayout, carId, game, data: rawData } = notification
+  const data = typeof rawData === 'string' ? JSON.parse(rawData) : rawData
 
   const track = trackId ? formatTrackName(trackId, trackLayout, game) : null
   const car = carId ? formatCarName(carId) : null
