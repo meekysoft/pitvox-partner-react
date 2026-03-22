@@ -1971,7 +1971,6 @@
 .pvx-dash-tooltip--scrollable {
   max-height: 20rem;
   overflow-y: auto;
-  pointer-events: auto;
 }
 
 /* ─── Records list (compact layout) ───────────────────────────── */
