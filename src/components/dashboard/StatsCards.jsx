@@ -33,24 +33,18 @@ function RatingIcon() {
 
 function BreakdownTooltip({ items, labelKey, countKey }) {
   if (!items?.length) return null
-  const top = items
+  const sorted = items
     .slice()
     .sort((a, b) => b[countKey] - a[countKey])
-    .slice(0, 10)
 
   return (
-    <div className="pvx-dash-tooltip">
-      {top.map((item, i) => (
+    <div className="pvx-dash-tooltip pvx-dash-tooltip--scrollable">
+      {sorted.map((item, i) => (
         <div key={i} className="pvx-dash-tooltip-row">
           <span className="pvx-dash-tooltip-label">{item[labelKey]}</span>
           <span className="pvx-dash-tooltip-value">{item[countKey]}</span>
         </div>
       ))}
-      {items.length > 10 && (
-        <div className="pvx-dash-tooltip-row pvx-dash-tooltip-more">
-          +{items.length - 10} more
-        </div>
-      )}
     </div>
   )
 }

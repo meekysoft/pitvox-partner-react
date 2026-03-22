@@ -1959,11 +1959,10 @@
   flex-shrink: 0;
 }
 
-.pvx-dash-tooltip-more {
-  color: var(--pvx-text-dimmed);
-  font-size: 0.75rem;
-  justify-content: center;
-  padding-top: 0.25rem;
+.pvx-dash-tooltip--scrollable {
+  max-height: 20rem;
+  overflow-y: auto;
+  pointer-events: auto;
 }
 
 /* ─── Records list (compact layout) ───────────────────────────── */
@@ -2143,6 +2142,14 @@
   letter-spacing: 0.05em;
   background: var(--pvx-accent);
   color: #fff;
+}
+
+.pvx-upcoming-remaining {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--pvx-text-muted);
+  text-align: center;
+  border-top: 1px solid var(--pvx-border);
 }
 
 /* ═══════════════════════════════════════════════════════════════════

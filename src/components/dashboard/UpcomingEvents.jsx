@@ -8,7 +8,7 @@ import { formatRelativeTime } from '../../utils/format.js'
  * @param {boolean} [props.isLoading]
  * @param {string} [props.className]
  */
-export function UpcomingEvents({ events, isLoading, className }) {
+export function UpcomingEvents({ events, isLoading, className, limit = 3 }) {
   if (isLoading) {
     return <div className="pvx-loading">Loading upcoming events...</div>
   }
@@ -16,6 +16,9 @@ export function UpcomingEvents({ events, isLoading, className }) {
   if (!events?.length) {
     return null
   }
+
+  const visible = limit ? events.slice(0, limit) : events
+  const remaining = events.length - visible.length
 
   return (
     <div className={`pvx-card ${className || ''}`}>
@@ -27,7 +30,7 @@ export function UpcomingEvents({ events, isLoading, className }) {
         </h3>
       </div>
       <div className="pvx-upcoming-list">
-        {events.map((event) => (
+        {visible.map((event) => (
           <div
             key={`${event.competitionId}-${event.roundNumber}`}
             className={`pvx-upcoming-item ${event.isNext ? 'pvx-upcoming-item--next' : ''}`}
@@ -51,6 +54,11 @@ export function UpcomingEvents({ events, isLoading, className }) {
             </div>
           </div>
         ))}
+        {remaining > 0 && (
+          <div className="pvx-upcoming-remaining">
+            +{remaining} more event{remaining !== 1 ? 's' : ''}
+          </div>
+        )}
       </div>
     </div>
   )
