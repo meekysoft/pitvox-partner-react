@@ -35,6 +35,7 @@ export { TracksTable } from './components/leaderboards/TracksTable.jsx'
 export { CarsTable } from './components/leaderboards/CarsTable.jsx'
 export { DriversTable } from './components/leaderboards/DriversTable.jsx'
 export { LapHistoryTable } from './components/leaderboards/LapHistoryTable.jsx'
+export { RankingsTable } from './components/leaderboards/RankingsTable.jsx'
 
 // Components — Competitions
 export { CompetitionCards } from './components/competitions/CompetitionCards.jsx'
@@ -46,7 +47,7 @@ export { RegistrationPanel } from './components/competitions/RegistrationPanel.j
 
 // Hooks — Dashboard
 export { useDriverStats } from './hooks/useDriverStats.js'
-export { useDriverRating } from './hooks/useDriverRating.js'
+export { useDriverRating, useDriverRatings } from './hooks/useDriverRating.js'
 export { useUpcomingEvents } from './hooks/useUpcomingEvents.js'
 
 // Hooks — Notifications

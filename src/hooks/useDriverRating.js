@@ -4,20 +4,35 @@ import { usePitVox } from '../provider.jsx'
 import { fetchCdnJson } from '../lib/cdn.js'
 
 /**
- * Fetch a driver's rating from the partner ratings CDN file.
+ * Shared query for partner ratings data.
+ * Both useDriverRating (single driver) and useDriverRatings (all drivers)
+ * share the same cache entry.
+ */
+function useRatingsQuery(options = {}) {
+  const { cdnUrl, partnerSlug } = usePitVox()
+  const { gameVersion, enabled = true } = options
+
+  const path = gameVersion
+    ? `leaderboards/partners/${partnerSlug}/v/${gameVersion}/ratings.json`
+    : `leaderboards/partners/${partnerSlug}/ratings.json`
+
+  return useQuery({
+    queryKey: ['pitvox', 'ratings', partnerSlug, gameVersion || null],
+    queryFn: () => fetchCdnJson(cdnUrl, path),
+    staleTime: 30_000,
+    refetchInterval: 30_000,
+    enabled,
+  })
+}
+
+/**
+ * Fetch a single driver's rating from the partner ratings CDN file.
  *
  * @param {string} steamId - Driver's Steam ID
  * @returns {{ data: object|null, isLoading: boolean, error: Error|null }}
  */
 export function useDriverRating(steamId) {
-  const { cdnUrl, partnerSlug } = usePitVox()
-
-  const query = useQuery({
-    queryKey: ['pitvox', 'ratings', partnerSlug],
-    queryFn: () => fetchCdnJson(cdnUrl, `leaderboards/partners/${partnerSlug}/ratings.json`),
-    staleTime: 60_000,
-    refetchInterval: 60_000,
-  })
+  const query = useRatingsQuery()
 
   const entry = useMemo(() => {
     if (!query.data?.drivers || !steamId) return null
@@ -39,5 +54,23 @@ export function useDriverRating(steamId) {
           combos: entry.combos || [],
         }
       : null,
+  }
+}
+
+/**
+ * Fetch all driver ratings for the rankings table.
+ *
+ * @param {object} [options]
+ * @param {string} [options.gameVersion] - EVO version filter (null/undefined for ACC)
+ * @param {boolean} [options.enabled] - Whether to enable the query (default true)
+ * @returns {{ data: object|null, isLoading: boolean, error: Error|null }}
+ */
+export function useDriverRatings(options = {}) {
+  const query = useRatingsQuery(options)
+
+  return {
+    data: query.data || null,
+    isLoading: query.isLoading,
+    error: query.error,
   }
 }

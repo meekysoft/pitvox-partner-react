@@ -17,7 +17,7 @@ import {
  * @param {(userId: string) => void} props.onDriverSelect
  * @param {(layer: string) => void} props.onNavigate
  */
-export function DriversTable({ entries, isLoading, track, carId, getUserDisplay, onDriverSelect, onNavigate }) {
+export function DriversTable({ entries, isLoading, track, carId, getUserDisplay, onDriverSelect, onNavigate, highlightId }) {
   const [sortConfig, onSort] = useSortConfig({ key: 'lapTimeMs', dir: 'asc' })
 
   const bestSectors = useMemo(() => calcBestSectors(entries), [entries])
@@ -71,11 +71,12 @@ export function DriversTable({ entries, isLoading, track, carId, getUserDisplay,
                 const isBestS1 = bestSectors && entry.sector1Ms === bestSectors.s1
                 const isBestS2 = bestSectors && entry.sector2Ms === bestSectors.s2
                 const isBestS3 = bestSectors && entry.sector3Ms === bestSectors.s3
+                const isHighlighted = highlightId && visibleId === highlightId
 
                 return (
                   <tr
                     key={visibleId}
-                    className={`pvx-row pvx-row--clickable ${rank <= 3 ? 'pvx-row--podium' : ''}`}
+                    className={`pvx-row pvx-row--clickable ${isHighlighted ? 'pvx-row--highlight' : rank <= 3 ? 'pvx-row--podium' : ''}`}
                     onClick={() => onDriverSelect(visibleId)}
                   >
                     <td className="pvx-td"><RankBadge rank={rank} podium /></td>
