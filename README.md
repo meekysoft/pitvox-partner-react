@@ -73,14 +73,15 @@ import {
 For building leaderboard pages with the SDK's `pvx-*` styles:
 
 ```jsx
-import { TracksTable, CarsTable, DriversTable, LapHistoryTable } from '@pitvox/partner-react'
+import { TracksTable, CarsTable, DriversTable, LapHistoryTable, RankingsTable } from '@pitvox/partner-react'
 import '@pitvox/partner-react/styles.css'
 ```
 
 - **`<TracksTable>`** — All tracks with record holders, tag filtering, sorting
 - **`<CarsTable>`** — Cars for a selected track with tag filtering
-- **`<DriversTable>`** — Drivers for a car with sectors (S1/S2/S3), tyre, fuel
+- **`<DriversTable>`** — Drivers for a car with sectors (S1/S2/S3), tyre, fuel. Accepts optional `highlightId` to visually highlight a specific driver row.
 - **`<LapHistoryTable>`** — Driver's lap history with validity and personal best highlighting
+- **`<RankingsTable>`** — Driver rankings across all car/track combos, with expandable combo details. Accepts `onComboSelect` callback for drill-down navigation.
 
 You compose these into your own page layout and wire up navigation between layers. See the [partner templates](https://github.com/meekysoft/pitvox-partner-template) for a complete example using React Router.
 
@@ -181,12 +182,17 @@ import { DriverProfile, StatsCards, RecordsTable, UpcomingEvents, NotificationsC
 ### Hooks
 
 ```jsx
-import { useDriverStats, useDriverRating, useUpcomingEvents } from '@pitvox/partner-react'
+import { useDriverStats, useDriverRating, useDriverRatings, useUpcomingEvents } from '@pitvox/partner-react'
 ```
 
 **`useDriverStats(steamId)`** — Driver stats, records, and ranking from CDN.
 
-**`useDriverRating(steamId)`** — Driver's rating from the partner ratings file.
+**`useDriverRating(steamId)`** — Single driver's rating from the partner ratings file.
+
+**`useDriverRatings(options?)`** — All driver ratings for the rankings table.
+- `options.gameVersion` — EVO version filter (null/undefined for ACC)
+- `options.enabled` — Whether to enable the query (default `true`)
+- Returns `{ data: { drivers: [...], driverCount }, isLoading, error }`
 
 **`useUpcomingEvents()`** — Upcoming competition rounds the current user is registered for (CDN-based).
 
