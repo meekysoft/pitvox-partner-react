@@ -1935,8 +1935,13 @@
   font-size: 0.8125rem;
 }
 
-.pvx-dash-stat-card--has-tooltip:hover .pvx-dash-tooltip {
+.pvx-dash-stat-card--clickable {
+  cursor: pointer;
+}
+
+.pvx-dash-tooltip--open {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .pvx-dash-tooltip-row {

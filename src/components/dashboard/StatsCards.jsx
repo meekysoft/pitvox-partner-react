@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import { formatCarName, formatTrackName } from '../../utils/format.js'
 
 /* ─── SVG icons (inline to avoid external deps) ─── */
@@ -31,20 +32,44 @@ function RatingIcon() {
   )
 }
 
-function BreakdownTooltip({ items, labelKey, countKey }) {
-  if (!items?.length) return null
-  const sorted = items
-    .slice()
-    .sort((a, b) => b[countKey] - a[countKey])
+function StatCardWithBreakdown({ icon, value, label, items, labelKey, countKey }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  const sorted = items?.length
+    ? items.slice().sort((a, b) => b[countKey] - a[countKey])
+    : null
 
   return (
-    <div className="pvx-dash-tooltip pvx-dash-tooltip--scrollable">
-      {sorted.map((item, i) => (
-        <div key={i} className="pvx-dash-tooltip-row">
-          <span className="pvx-dash-tooltip-label">{item[labelKey]}</span>
-          <span className="pvx-dash-tooltip-value">{item[countKey]}</span>
+    <div
+      ref={ref}
+      className={`pvx-dash-stat-card ${sorted ? 'pvx-dash-stat-card--clickable' : ''}`}
+      onClick={sorted ? () => setOpen((v) => !v) : undefined}
+    >
+      {icon}
+      <div className="pvx-dash-stat-content">
+        <span className="pvx-dash-stat-value">{value}</span>
+        <span className="pvx-dash-stat-label">{label}</span>
+      </div>
+      {sorted && (
+        <div className={`pvx-dash-tooltip pvx-dash-tooltip--scrollable ${open ? 'pvx-dash-tooltip--open' : ''}`}>
+          {sorted.map((item, i) => (
+            <div key={i} className="pvx-dash-tooltip-row">
+              <span className="pvx-dash-tooltip-label">{item[labelKey]}</span>
+              <span className="pvx-dash-tooltip-value">{item[countKey]}</span>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
     </div>
   )
 }
@@ -73,23 +98,23 @@ export function StatsCards({ stats, rating, className = '' }) {
 
   return (
     <div className={`pvx-dash-stats ${className}`}>
-      <div className="pvx-dash-stat-card pvx-dash-stat-card--has-tooltip">
-        <HashIcon />
-        <div className="pvx-dash-stat-content">
-          <span className="pvx-dash-stat-value">{stats.lapCount.toLocaleString()}</span>
-          <span className="pvx-dash-stat-label">Total Laps</span>
-        </div>
-        <BreakdownTooltip items={trackItems} labelKey="name" countKey="lapCount" />
-      </div>
+      <StatCardWithBreakdown
+        icon={<HashIcon />}
+        value={stats.lapCount.toLocaleString()}
+        label="Total Laps"
+        items={trackItems}
+        labelKey="name"
+        countKey="lapCount"
+      />
 
-      <div className="pvx-dash-stat-card pvx-dash-stat-card--has-tooltip">
-        <SteeringWheelIcon />
-        <div className="pvx-dash-stat-content">
-          <span className="pvx-dash-stat-value">{stats.carBreakdown.length}</span>
-          <span className="pvx-dash-stat-label">Cars Used</span>
-        </div>
-        <BreakdownTooltip items={carItems} labelKey="name" countKey="lapCount" />
-      </div>
+      <StatCardWithBreakdown
+        icon={<SteeringWheelIcon />}
+        value={stats.carBreakdown.length}
+        label="Cars Used"
+        items={carItems}
+        labelKey="name"
+        countKey="lapCount"
+      />
 
       {rating && (
         <div className="pvx-dash-stat-card pvx-dash-stat-card--rating">
