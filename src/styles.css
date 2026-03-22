@@ -212,6 +212,10 @@
   width: 4rem;
 }
 
+.pvx-th--center {
+  text-align: center;
+}
+
 .pvx-th-inner {
   display: inline-flex;
   align-items: center;
