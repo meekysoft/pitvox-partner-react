@@ -2160,6 +2160,48 @@
   border-top: 1px solid var(--pvx-border);
 }
 
+.pvx-server-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.pvx-server-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--pvx-text-muted);
+  background: var(--pvx-bg-subtle, rgba(128, 128, 128, 0.1));
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.pvx-server-detail--clickable {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.pvx-server-detail--clickable:hover {
+  background: var(--pvx-bg-hover, rgba(128, 128, 128, 0.2));
+}
+
+.pvx-server-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.pvx-server-icon--action {
+  opacity: 0.5;
+}
+
+.pvx-server-icon--copied {
+  color: var(--pvx-success, #22c55e);
+  opacity: 1;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    Notifications
    ═══════════════════════════════════════════════════════════════════ */

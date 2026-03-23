@@ -7,12 +7,13 @@ import { fetchCdnJson } from '../lib/cdn.js'
  * Fetch upcoming competition rounds the current user is registered for.
  *
  * Composes CDN data: competitions index + entry lists per competition.
+ * Optionally fetches server passwords via onFetchServerPassword callback.
  * Returns a flat, sorted array of upcoming rounds with competition context.
  *
  * @returns {{ data: Array, isLoading: boolean }}
  */
 export function useUpcomingEvents() {
-  const { cdnUrl, partnerSlug, getSteamId } = usePitVox()
+  const { cdnUrl, partnerSlug, getSteamId, onFetchServerPassword } = usePitVox()
   const steamId = getSteamId()
 
   // Step 1: Fetch all partner competitions
@@ -40,8 +41,8 @@ export function useUpcomingEvents() {
 
   const entryListsLoading = entryListQueries.some((q) => q.isLoading)
 
-  // Step 3: Derive upcoming events
-  const events = useMemo(() => {
+  // Step 3: Derive upcoming events (without passwords)
+  const upcomingEvents = useMemo(() => {
     if (!competitions || !steamId || entryListsLoading) return []
 
     const now = new Date()
@@ -81,6 +82,34 @@ export function useUpcomingEvents() {
 
     return upcoming
   }, [competitions, steamId, entryListsLoading, entryListQueries])
+
+  // Step 4: Fetch server passwords for each upcoming event
+  // Each unique competitionId+roundNumber gets its own query
+  const serverInfoQueries = useQueries({
+    queries: upcomingEvents.map((event) => ({
+      queryKey: ['pitvox', 'serverInfo', event.competitionId, event.roundNumber],
+      queryFn: () => onFetchServerPassword(event.competitionId, event.roundNumber),
+      enabled: !!onFetchServerPassword && upcomingEvents.length > 0,
+      staleTime: 5 * 60_000, // 5 minutes
+      retry: false,
+    })),
+  })
+
+  // Step 5: Merge server info into events
+  const events = useMemo(() => {
+    if (!upcomingEvents.length) return []
+    if (!onFetchServerPassword) return upcomingEvents
+
+    return upcomingEvents.map((event, i) => {
+      const serverInfo = serverInfoQueries[i]?.data
+      if (!serverInfo?.success) return event
+      return {
+        ...event,
+        serverAddress: serverInfo.serverAddress || null,
+        serverPassword: serverInfo.serverPassword || null,
+      }
+    })
+  }, [upcomingEvents, onFetchServerPassword, serverInfoQueries])
 
   return {
     data: events,

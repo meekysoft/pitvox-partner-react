@@ -194,7 +194,7 @@ import { useDriverStats, useDriverRating, useDriverRatings, useUpcomingEvents } 
 - `options.enabled` — Whether to enable the query (default `true`)
 - Returns `{ data: { drivers: [...], driverCount }, isLoading, error }`
 
-**`useUpcomingEvents()`** — Upcoming competition rounds the current user is registered for (CDN-based).
+**`useUpcomingEvents()`** — Upcoming competition rounds the current user is registered for (CDN-based). When `onFetchServerPassword` is provided to the provider, each event includes `serverAddress` and `serverPassword` fields.
 
 ## Notifications
 
@@ -237,6 +237,29 @@ import {
 **`useMarkAllNotificationsRead()`** — Mutation to mark all as read.
 
 **`useNotificationsEnabled()`** — Returns `boolean` — whether notification callbacks are provided.
+
+## Server Password
+
+Registered drivers can see server connection details (address + password) for their upcoming events. This requires a backend query that validates registration before returning the password.
+
+Provide the callback to the provider:
+
+```jsx
+<PitVoxPartnerProvider
+  partnerSlug="your-slug"
+  getSteamId={() => user?.steamId ?? null}
+  onFetchServerPassword={async (competitionId, roundNumber) => {
+    // Call your backend (e.g. AppSync query) which validates registration
+    // and returns the server details
+    const result = await client.queries.getServerPassword({ competitionId, roundNumber })
+    return result.data // { success, serverAddress?, serverPassword?, error? }
+  }}
+>
+```
+
+When provided, `useUpcomingEvents()` automatically fetches server info for each event and the `<UpcomingEvents>` component displays the password with copy-to-clipboard.
+
+When no callback is provided, server info is simply omitted from events.
 
 ## Registration
 
