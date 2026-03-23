@@ -72,36 +72,53 @@ export function UpcomingEvents({ events, isLoading, className, limit = 3 }) {
 }
 
 function ServerPasswordDisplay({ password, address }) {
-  const [copied, setCopied] = useState(null)
+  const [copied, setCopied] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
-  const handleCopy = useCallback(async (text, field) => {
+  const joinString = address
+    ? password
+      ? `join:${address}|${password}`
+      : `join:${address}`
+    : null
+
+  const handleCopyJoin = useCallback(async () => {
+    if (!joinString) return
     try {
-      await navigator.clipboard.writeText(text)
-      setCopied(field)
-      setTimeout(() => setCopied(null), 2000)
+      await navigator.clipboard.writeText(joinString)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     } catch {
-      // Fallback — ignore if clipboard not available
+      // ignore if clipboard not available
     }
-  }, [])
+  }, [joinString])
 
   return (
     <div className="pvx-server-info">
-      {address && (
+      {joinString && (
         <span
           className="pvx-server-detail pvx-server-detail--clickable"
-          onClick={() => handleCopy(address, 'address')}
-          title="Click to copy server address"
+          onClick={handleCopyJoin}
+          title="Copy join string to clipboard"
         >
-          <ServerIcon /> {address} {copied === 'address' ? <CheckIcon /> : <CopyIcon />}
+          <CopyIcon /> {copied ? 'Copied!' : 'Join'}
         </span>
       )}
-      <span
-        className="pvx-server-detail pvx-server-detail--clickable"
-        onClick={() => handleCopy(password, 'password')}
-        title="Click to copy server password"
-      >
-        <LockIcon /> {password} {copied === 'password' ? <CheckIcon /> : <CopyIcon />}
-      </span>
+      {password && (
+        <>
+          <span
+            className="pvx-server-detail pvx-server-detail--clickable"
+            onClick={() => setShowPassword((s) => !s)}
+            title={showPassword ? 'Hide password' : 'Reveal password'}
+          >
+            {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+          </span>
+          {showPassword && (
+            <span className="pvx-server-detail">
+              <LockIcon /> {password}
+            </span>
+          )}
+        </>
+      )}
     </div>
   )
 }
@@ -142,16 +159,6 @@ function LockIcon() {
   )
 }
 
-function ServerIcon() {
-  return (
-    <svg className="pvx-server-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="2" width="20" height="8" rx="2" />
-      <rect x="2" y="14" width="20" height="8" rx="2" />
-      <circle cx="6" cy="6" r="1" /><circle cx="6" cy="18" r="1" />
-    </svg>
-  )
-}
-
 function CopyIcon() {
   return (
     <svg className="pvx-server-icon pvx-server-icon--action" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -161,10 +168,18 @@ function CopyIcon() {
   )
 }
 
-function CheckIcon() {
+function EyeIcon() {
   return (
-    <svg className="pvx-server-icon pvx-server-icon--action pvx-server-icon--copied" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 6L9 17l-5-5" />
+    <svg className="pvx-server-icon pvx-server-icon--action" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+    </svg>
+  )
+}
+
+function EyeOffIcon() {
+  return (
+    <svg className="pvx-server-icon pvx-server-icon--action" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" />
     </svg>
   )
 }
