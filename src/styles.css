@@ -2172,8 +2172,8 @@
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: var(--pvx-text-secondary, #374151);
-  background: var(--pvx-bg-subtle, rgba(99, 102, 241, 0.1));
+  color: var(--pvx-text);
+  background: var(--pvx-bg-subtle, rgba(99, 102, 241, 0.15));
   padding: 0.125rem 0.5rem;
   border-radius: 4px;
   font-family: monospace;
