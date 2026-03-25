@@ -38,7 +38,7 @@ export { LapHistoryTable } from './components/leaderboards/LapHistoryTable.jsx'
 export { RankingsTable } from './components/leaderboards/RankingsTable.jsx'
 
 // Components — Competitions
-export { CompetitionCards } from './components/competitions/CompetitionCards.jsx'
+export { CompetitionCards, CompetitionCard } from './components/competitions/CompetitionCards.jsx'
 export { StandingsTable } from './components/competitions/StandingsTable.jsx'
 export { RoundResults, RoundSessionResults } from './components/competitions/RoundResults.jsx'
 export { EntryList } from './components/competitions/EntryList.jsx'

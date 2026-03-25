@@ -38,7 +38,7 @@ export function CompetitionCards({ competitions, isLoading, onSelect, onRegister
   )
 }
 
-function CompetitionCard({ comp, onSelect, onRegister }) {
+export function CompetitionCard({ comp, onSelect, onRegister }) {
   const { cdnUrl } = usePitVox()
   const posterUrl = comp.posterCdnPath ? `${cdnUrl}/${comp.posterCdnPath}` : null
 
