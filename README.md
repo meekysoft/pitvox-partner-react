@@ -116,13 +116,14 @@ import {
 
 ```jsx
 import {
-  CompetitionCards, StandingsTable, RoundResults, RoundSessionResults,
-  EntryList, RegisterButton, RegistrationPanel,
+  CompetitionCards, CompetitionCard, StandingsTable, RoundResults,
+  RoundSessionResults, EntryList, RegisterButton, RegistrationPanel,
 } from '@pitvox/partner-react'
 import '@pitvox/partner-react/styles.css'
 ```
 
-- **`<CompetitionCards>`** — Card grid with posters, type badges, schedule, registration status
+- **`<CompetitionCards>`** — Card grid with posters, type badges, schedule, registration status. Bundles its own CSS grid layout.
+- **`<CompetitionCard>`** — Individual competition card. Use this when you want to control the grid layout yourself (e.g. with Tailwind). Props: `comp`, `onSelect`, `onRegister`.
 - **`<StandingsTable>`** — Championship standings with per-round breakdowns, podium highlights
 - **`<RoundResults>`** — Standalone round results (fetches data, renders header + sessions)
 - **`<RoundSessionResults>`** — Session tabs + results table (data-prop driven, no fetch)
