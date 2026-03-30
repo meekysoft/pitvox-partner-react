@@ -14,13 +14,16 @@ export function formatLapTime(ms) {
 }
 
 /**
- * Format milliseconds as a sector time (SS.mmm).
+ * Format milliseconds as a sector time.
+ * Under 60s: "SS.mmm" (e.g. "34.567")
+ * 60s and over: "M:SS.mmm" (e.g. "3:17.487")
  *
  * @param {number} ms - Sector time in milliseconds
- * @returns {string} e.g. "34.567"
+ * @returns {string}
  */
 export function formatSectorTime(ms) {
   if (!ms && ms !== 0) return '-'
+  if (ms >= 60_000) return formatLapTime(ms)
   return (ms / 1000).toFixed(3)
 }
 

@@ -172,10 +172,28 @@ export function useDriverLaps(userId, trackId, layout, carId, options = {}) {
       .sort((a, b) => a.lapTimeMs - b.lapTimeMs)
   }, [query.data?.laps, trackId, layout, carId, game, gameVersion, showInvalid])
 
+  // Theoretical best lap = sum of best individual sectors across all valid laps
+  const theoreticalBest = useMemo(() => {
+    const validLaps = filteredLaps.filter((l) => l.isValid && l.sector1Ms && l.sector2Ms && l.sector3Ms)
+    if (validLaps.length < 2) return null
+
+    const bestS1 = Math.min(...validLaps.map((l) => l.sector1Ms))
+    const bestS2 = Math.min(...validLaps.map((l) => l.sector2Ms))
+    const bestS3 = Math.min(...validLaps.map((l) => l.sector3Ms))
+    const total = bestS1 + bestS2 + bestS3
+
+    const bestLapTime = Math.min(...validLaps.map((l) => l.lapTimeMs))
+    // Only meaningful if faster than the actual best lap
+    if (total >= bestLapTime) return null
+
+    return { lapTimeMs: total, sector1Ms: bestS1, sector2Ms: bestS2, sector3Ms: bestS3 }
+  }, [filteredLaps])
+
   return {
     ...query,
     data: filteredLaps,
     driverName: query.data?.driverName || 'Driver',
+    theoreticalBest,
   }
 }
 

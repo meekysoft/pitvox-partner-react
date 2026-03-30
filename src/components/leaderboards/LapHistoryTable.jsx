@@ -18,7 +18,7 @@ import { calcBestSectors, Breadcrumb, EmptyState, LoadingState, CheckIcon, Cross
  * @param {(layer: string) => void} props.onNavigate
  */
 export function LapHistoryTable({ userId, track, carId, game, gameVersion, showInvalid, getUserDisplay, onToggleInvalid, onNavigate }) {
-  const { data: laps, driverName, isLoading } = useDriverLaps(userId, track.id, track.layout, carId, { showInvalid, game, gameVersion })
+  const { data: laps, driverName, theoreticalBest, isLoading } = useDriverLaps(userId, track.id, track.layout, carId, { showInvalid, game, gameVersion })
   const { displayName, avatarUrl } = getUserDisplay(userId, driverName)
 
   const bestSectors = useMemo(() => calcBestSectors(laps, true), [laps])
@@ -58,6 +58,15 @@ export function LapHistoryTable({ userId, track, carId, game, gameVersion, showI
           <span>Show invalid laps</span>
         </label>
       </div>
+      {theoreticalBest && (
+        <div className="pvx-theoretical-best">
+          <span className="pvx-theoretical-best-label">Theoretical Best:</span>
+          <span className="pvx-theoretical-best-time">{formatLapTime(theoreticalBest.lapTimeMs)}</span>
+          <span className="pvx-theoretical-best-sectors">
+            ({formatSectorTime(theoreticalBest.sector1Ms)} + {formatSectorTime(theoreticalBest.sector2Ms)} + {formatSectorTime(theoreticalBest.sector3Ms)})
+          </span>
+        </div>
+      )}
       {!laps?.length ? (
         <EmptyState message={showInvalid ? 'No laps recorded for this combination.' : 'No valid laps. Try enabling "Show invalid laps".'} />
       ) : (

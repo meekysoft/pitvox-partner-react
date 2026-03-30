@@ -465,6 +465,34 @@
   accent-color: var(--pvx-accent);
 }
 
+/* ─── Theoretical Best ──────────────────────────────────────── */
+
+.pvx-theoretical-best {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid var(--pvx-border);
+  color: var(--pvx-text-muted);
+}
+
+.pvx-theoretical-best-label {
+  font-weight: 600;
+  color: var(--pvx-text);
+}
+
+.pvx-theoretical-best-time {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  font-weight: 600;
+  color: var(--pvx-accent);
+}
+
+.pvx-theoretical-best-sectors {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  font-size: 0.75rem;
+}
+
 /* ─── Icons ──────────────────────────────────────────────────── */
 
 .pvx-icon {
