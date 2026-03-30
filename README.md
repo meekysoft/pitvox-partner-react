@@ -37,6 +37,16 @@ function App() {
 
 > The provider auto-creates a `QueryClient` if your app doesn't already have one. If you use React Query elsewhere, wrap with your own `QueryClientProvider` first and the SDK will share it.
 
+### Global mode
+
+`partnerSlug` is optional. Omit it (or pass `null`) to use global CDN paths instead of partner-scoped ones. This is useful for sites like pitvox.com that display leaderboards and competitions across all partners.
+
+```jsx
+<PitVoxPartnerProvider cdnUrl="https://cdn.pitvox.com">
+  {/* hooks return global data */}
+</PitVoxPartnerProvider>
+```
+
 ## Leaderboards
 
 ### Hooks
@@ -46,6 +56,7 @@ import {
   useLeaderboardIndex,
   useTrackLeaderboard,
   useDriverLaps,
+  useRecentLaps,
   useUserLookup,
   useCarMetadata,
 } from '@pitvox/partner-react'
@@ -62,7 +73,11 @@ import {
 
 **`useDriverLaps(userId, trackId, layout, carId, options?)`** — Fetch a driver's lap history.
 - `options.showInvalid` — Include invalid laps (default `false`)
-- Returns `{ data: Lap[], isLoading, driverName }`
+- Returns `{ data: Lap[], isLoading, driverName, theoreticalBest }`
+- `theoreticalBest` — `{ lapTimeMs, sector1Ms, sector2Ms, sector3Ms }` or `null`. Computed from the best individual sectors across all valid laps. Only returned when it's faster than the actual best lap and there are at least 2 valid laps.
+
+**`useRecentLaps()`** — Fetch recent lap activity.
+- Returns `{ groups: Activity[], generatedAt, isLoading }`
 
 **`useUserLookup()`** — Returns a lookup function: `(userId, fallback?) => { displayName, avatarUrl, affiliations }`
 
@@ -100,17 +115,19 @@ import {
 } from '@pitvox/partner-react'
 ```
 
-**`useCompetitions()`** — All competitions for this partner.
+**`useCompetitions()`** — All competitions for this partner (or all competitions in global mode).
 
-**`useCompetitionConfig(competitionId)`** — Single competition config (name, rounds, countingRounds, etc.).
+**`useCompetitionConfig(competitionId, options?)`** — Single competition config (name, rounds, countingRounds, etc.).
 
-**`useCompetitionStandings(competitionId)`** — Championship standings with per-round breakdowns.
+**`useCompetitionStandings(competitionId, options?)`** — Championship standings with per-round breakdowns.
 
-**`useCompetitionRound(competitionId, roundNumber)`** — Single round results with session data.
+**`useCompetitionRound(competitionId, roundNumber, options?)`** — Single round results with session data.
 
-**`useCompetitionAllRounds(competitionId, roundNumbers)`** — Fetch multiple round results in parallel.
+**`useCompetitionAllRounds(competitionId, roundNumbers, options?)`** — Fetch multiple round results in parallel.
 
-**`useCompetitionEntryList(competitionId)`** — Registered drivers.
+**`useCompetitionEntryList(competitionId, options?)`** — Registered drivers.
+
+All competition detail hooks accept `options.partnerSlug` to override the provider's slug. This is useful in global mode where the partner slug comes from the competition data rather than from context.
 
 ### Styled components
 
@@ -308,7 +325,7 @@ import { useRegistrationStatus, useRegister, useWithdraw, useRegistrationMode, u
 ```jsx
 import {
   formatLapTime,       // 92365 → "1:32.365"
-  formatSectorTime,    // 34567 → "34.567"
+  formatSectorTime,    // 34567 → "34.567", 197487 → "3:17.487"
   formatCarName,       // "ks_ferrari_296_gt3" → "Ferrari 296 Gt3"
   formatTrackName,     // "donington_park", "national" → "Donington Park National"
   formatDate,          // ISO string → "27 Feb 2024"
