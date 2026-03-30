@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { usePitVox } from '../provider.jsx'
-import { fetchCdnJson } from '../lib/cdn.js'
+import { fetchCdnJson, buildLeaderboardPath, buildLapsPath, buildRecentLapsPath } from '../lib/cdn.js'
 import { formatCarName, formatTrackName } from '../utils/format.js'
 
 /**
- * Fetch the leaderboard index (all tracks with record holders) for this partner.
+ * Fetch the leaderboard index (all tracks with record holders).
+ * In partner mode, returns partner-scoped data. In global mode, returns all data.
  *
  * @param {object} [options]
  * @param {string} [options.game] - Filter by game ('evo' | 'acc')
@@ -15,9 +16,11 @@ export function useLeaderboardIndex(options = {}) {
   const { cdnUrl, partnerSlug } = usePitVox()
   const { game, gameVersion } = options
 
+  const path = buildLeaderboardPath(partnerSlug, 'index.json')
+
   const query = useQuery({
     queryKey: ['pitvox', 'leaderboards', partnerSlug, 'index'],
-    queryFn: () => fetchCdnJson(cdnUrl, `leaderboards/partners/${partnerSlug}/index.json`),
+    queryFn: () => fetchCdnJson(cdnUrl, path),
     staleTime: 30_000,
     refetchInterval: 30_000,
   })
@@ -77,9 +80,8 @@ export function useTrackLeaderboard(trackId, layout, options = {}) {
   const { carId, game, gameVersion } = options
 
   const layoutKey = layout || 'default'
-  const path = gameVersion
-    ? `leaderboards/partners/${partnerSlug}/v/${gameVersion}/tracks/${trackId}/${layoutKey}.json`
-    : `leaderboards/partners/${partnerSlug}/tracks/${trackId}/${layoutKey}.json`
+  const versionSegment = gameVersion ? `v/${gameVersion}/` : ''
+  const path = buildLeaderboardPath(partnerSlug, `${versionSegment}tracks/${trackId}/${layoutKey}.json`)
 
   const { data: rawData, isLoading, error } = useQuery({
     queryKey: ['pitvox', 'leaderboards', partnerSlug, 'track', trackId, layoutKey, gameVersion],
@@ -140,9 +142,11 @@ export function useDriverLaps(userId, trackId, layout, carId, options = {}) {
   const { cdnUrl, partnerSlug } = usePitVox()
   const { showInvalid = false, game, gameVersion } = options
 
+  const path = buildLapsPath(partnerSlug, userId)
+
   const query = useQuery({
     queryKey: ['pitvox', 'laps', partnerSlug, userId],
-    queryFn: () => fetchCdnJson(cdnUrl, `laps/partners/${partnerSlug}/${userId}.json`),
+    queryFn: () => fetchCdnJson(cdnUrl, path),
     enabled: !!userId,
     staleTime: 30_000,
     refetchInterval: 30_000,
@@ -218,6 +222,32 @@ export function useCarMetadata() {
   return {
     tags: data?.tags || [],
     cars: data?.cars || {},
+  }
+}
+
+/**
+ * Fetch recent lap activity from CDN.
+ * In partner mode, returns partner-scoped activity. In global mode, returns all activity.
+ *
+ * @returns {{ groups: object[], generatedAt: string|null, isLoading: boolean }}
+ */
+export function useRecentLaps() {
+  const { cdnUrl, partnerSlug } = usePitVox()
+
+  const path = buildRecentLapsPath(partnerSlug)
+
+  const query = useQuery({
+    queryKey: ['pitvox', 'recentLaps', partnerSlug],
+    queryFn: () => fetchCdnJson(cdnUrl, path),
+    staleTime: 30_000,
+    refetchInterval: 30_000,
+    gcTime: 10 * 60_000,
+  })
+
+  return {
+    groups: query.data?.groups || [],
+    generatedAt: query.data?.generatedAt || null,
+    isLoading: query.isLoading,
   }
 }
 

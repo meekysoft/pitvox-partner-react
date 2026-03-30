@@ -13,7 +13,7 @@ let internalQueryClient = null
  * Provider for PitVox partner SDK.
  *
  * @param {object} props
- * @param {string} props.partnerSlug - Partner identifier (e.g., 'mrgit')
+ * @param {string} [props.partnerSlug] - Partner identifier (e.g., 'mrgit'). Omit for global (non-partner) mode.
  * @param {string} [props.cdnUrl] - CDN base URL (default: https://cdn.pitvox.com)
  * @param {string} [props.pitvoxUrl] - PitVox website URL for registration links (default: https://pitvox.com)
  * @param {() => string|null} [props.getSteamId] - Function returning current user's Steam ID
@@ -26,7 +26,7 @@ let internalQueryClient = null
  * @param {import('react').ReactNode} props.children
  */
 export function PitVoxPartnerProvider({
-  partnerSlug,
+  partnerSlug = null,
   cdnUrl = DEFAULT_CDN_URL,
   pitvoxUrl = DEFAULT_PITVOX_URL,
   getSteamId,

@@ -50,6 +50,7 @@ export function formatCarName(carId) {
  * @returns {string} e.g. "Donington Park National"
  */
 export function formatTrackName(trackId, layout, game) {
+  if (!trackId) return ''
   const trackName = trackId
     .split('_')
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))

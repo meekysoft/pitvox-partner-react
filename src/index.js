@@ -9,6 +9,7 @@ export {
   useUserLookup,
   useCarMetadata,
   useCarLeaderboard,
+  useRecentLaps,
 } from './hooks/useLeaderboards.js'
 
 // Hooks — Competitions
@@ -77,6 +78,9 @@ export {
   CompLoadingState,
   CompEmptyState,
 } from './components/competitions/shared.jsx'
+
+// CDN utilities
+export { fetchCdnJson, buildLeaderboardPath, buildLapsPath, buildRecentLapsPath } from './lib/cdn.js'
 
 // Utilities
 export {

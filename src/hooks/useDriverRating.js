@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { usePitVox } from '../provider.jsx'
-import { fetchCdnJson } from '../lib/cdn.js'
+import { fetchCdnJson, buildLeaderboardPath } from '../lib/cdn.js'
 
 /**
- * Shared query for partner ratings data.
+ * Shared query for ratings data.
  * Both useDriverRating (single driver) and useDriverRatings (all drivers)
  * share the same cache entry.
  */
@@ -12,9 +12,8 @@ function useRatingsQuery(options = {}) {
   const { cdnUrl, partnerSlug } = usePitVox()
   const { gameVersion, enabled = true } = options
 
-  const path = gameVersion
-    ? `leaderboards/partners/${partnerSlug}/v/${gameVersion}/ratings.json`
-    : `leaderboards/partners/${partnerSlug}/ratings.json`
+  const versionSegment = gameVersion ? `v/${gameVersion}/` : ''
+  const path = buildLeaderboardPath(partnerSlug, `${versionSegment}ratings.json`)
 
   return useQuery({
     queryKey: ['pitvox', 'ratings', partnerSlug, gameVersion || null],
@@ -26,7 +25,7 @@ function useRatingsQuery(options = {}) {
 }
 
 /**
- * Fetch a single driver's rating from the partner ratings CDN file.
+ * Fetch a single driver's rating from the ratings CDN file.
  *
  * @param {string} steamId - Driver's Steam ID
  * @returns {{ data: object|null, isLoading: boolean, error: Error|null }}

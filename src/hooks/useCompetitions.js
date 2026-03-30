@@ -3,8 +3,9 @@ import { usePitVox } from '../provider.jsx'
 import { fetchCdnJson } from '../lib/cdn.js'
 
 /**
- * Fetch all competitions for this partner from the CDN index.
- * Returns the partner's competitions filtered by partnerSlug.
+ * Fetch competitions from the CDN index.
+ * In partner mode, filters to this partner's competitions.
+ * In global mode (no partnerSlug), returns all competitions.
  */
 export function useCompetitions() {
   const { cdnUrl, partnerSlug } = usePitVox()
@@ -14,7 +15,9 @@ export function useCompetitions() {
     queryFn: async () => {
       const index = await fetchCdnJson(cdnUrl, 'competitions/index.json')
       if (!index?.competitions) return []
-      return index.competitions.filter((c) => c.partnerSlug === partnerSlug)
+      return partnerSlug
+        ? index.competitions.filter((c) => c.partnerSlug === partnerSlug)
+        : index.competitions
     },
     staleTime: 60_000,
   })
@@ -24,14 +27,17 @@ export function useCompetitions() {
  * Fetch a single competition's config from CDN.
  *
  * @param {string} competitionId
+ * @param {object} [options]
+ * @param {string} [options.partnerSlug] - Override partner slug (for global mode where slug comes from competition data)
  */
-export function useCompetitionConfig(competitionId) {
-  const { cdnUrl, partnerSlug } = usePitVox()
+export function useCompetitionConfig(competitionId, options = {}) {
+  const ctx = usePitVox()
+  const slug = options.partnerSlug || ctx.partnerSlug
 
   return useQuery({
-    queryKey: ['pitvox', 'competition', partnerSlug, competitionId, 'config'],
-    queryFn: () => fetchCdnJson(cdnUrl, `competitions/${partnerSlug}/${competitionId}/config.json`),
-    enabled: !!competitionId,
+    queryKey: ['pitvox', 'competition', slug, competitionId, 'config'],
+    queryFn: () => fetchCdnJson(ctx.cdnUrl, `competitions/${slug}/${competitionId}/config.json`),
+    enabled: !!slug && !!competitionId,
     staleTime: 60_000,
   })
 }
@@ -40,14 +46,17 @@ export function useCompetitionConfig(competitionId) {
  * Fetch championship standings from CDN.
  *
  * @param {string} competitionId
+ * @param {object} [options]
+ * @param {string} [options.partnerSlug] - Override partner slug
  */
-export function useCompetitionStandings(competitionId) {
-  const { cdnUrl, partnerSlug } = usePitVox()
+export function useCompetitionStandings(competitionId, options = {}) {
+  const ctx = usePitVox()
+  const slug = options.partnerSlug || ctx.partnerSlug
 
   return useQuery({
-    queryKey: ['pitvox', 'competition', partnerSlug, competitionId, 'standings'],
-    queryFn: () => fetchCdnJson(cdnUrl, `competitions/${partnerSlug}/${competitionId}/standings.json`),
-    enabled: !!competitionId,
+    queryKey: ['pitvox', 'competition', slug, competitionId, 'standings'],
+    queryFn: () => fetchCdnJson(ctx.cdnUrl, `competitions/${slug}/${competitionId}/standings.json`),
+    enabled: !!slug && !!competitionId,
     staleTime: 60_000,
   })
 }
@@ -57,14 +66,17 @@ export function useCompetitionStandings(competitionId) {
  *
  * @param {string} competitionId
  * @param {number} roundNumber
+ * @param {object} [options]
+ * @param {string} [options.partnerSlug] - Override partner slug
  */
-export function useCompetitionRound(competitionId, roundNumber) {
-  const { cdnUrl, partnerSlug } = usePitVox()
+export function useCompetitionRound(competitionId, roundNumber, options = {}) {
+  const ctx = usePitVox()
+  const slug = options.partnerSlug || ctx.partnerSlug
 
   return useQuery({
-    queryKey: ['pitvox', 'competition', partnerSlug, competitionId, 'round', roundNumber],
-    queryFn: () => fetchCdnJson(cdnUrl, `competitions/${partnerSlug}/${competitionId}/rounds/${roundNumber}.json`),
-    enabled: !!competitionId && roundNumber != null,
+    queryKey: ['pitvox', 'competition', slug, competitionId, 'round', roundNumber],
+    queryFn: () => fetchCdnJson(ctx.cdnUrl, `competitions/${slug}/${competitionId}/rounds/${roundNumber}.json`),
+    enabled: !!slug && !!competitionId && roundNumber != null,
     staleTime: 60_000,
   })
 }
@@ -74,22 +86,25 @@ export function useCompetitionRound(competitionId, roundNumber) {
  *
  * @param {string} competitionId
  * @param {number[]} roundNumbers - Array of round numbers to fetch
+ * @param {object} [options]
+ * @param {string} [options.partnerSlug] - Override partner slug
  */
-export function useCompetitionAllRounds(competitionId, roundNumbers = []) {
-  const { cdnUrl, partnerSlug } = usePitVox()
+export function useCompetitionAllRounds(competitionId, roundNumbers = [], options = {}) {
+  const ctx = usePitVox()
+  const slug = options.partnerSlug || ctx.partnerSlug
 
   return useQuery({
-    queryKey: ['pitvox', 'competition', partnerSlug, competitionId, 'allRounds', roundNumbers],
+    queryKey: ['pitvox', 'competition', slug, competitionId, 'allRounds', roundNumbers],
     queryFn: async () => {
       const results = await Promise.all(
         roundNumbers.map((num) =>
-          fetchCdnJson(cdnUrl, `competitions/${partnerSlug}/${competitionId}/rounds/${num}.json`)
+          fetchCdnJson(ctx.cdnUrl, `competitions/${slug}/${competitionId}/rounds/${num}.json`)
             .catch(() => null)
         )
       )
       return results.filter(Boolean)
     },
-    enabled: !!competitionId && roundNumbers.length > 0,
+    enabled: !!slug && !!competitionId && roundNumbers.length > 0,
     staleTime: 60_000,
   })
 }
@@ -98,14 +113,17 @@ export function useCompetitionAllRounds(competitionId, roundNumbers = []) {
  * Fetch the entry list (registered drivers) for a competition from CDN.
  *
  * @param {string} competitionId
+ * @param {object} [options]
+ * @param {string} [options.partnerSlug] - Override partner slug
  */
-export function useCompetitionEntryList(competitionId) {
-  const { cdnUrl, partnerSlug } = usePitVox()
+export function useCompetitionEntryList(competitionId, options = {}) {
+  const ctx = usePitVox()
+  const slug = options.partnerSlug || ctx.partnerSlug
 
   return useQuery({
-    queryKey: ['pitvox', 'competition', partnerSlug, competitionId, 'entrylist'],
-    queryFn: () => fetchCdnJson(cdnUrl, `competitions/${partnerSlug}/${competitionId}/entrylist.json`),
-    enabled: !!competitionId,
+    queryKey: ['pitvox', 'competition', slug, competitionId, 'entrylist'],
+    queryFn: () => fetchCdnJson(ctx.cdnUrl, `competitions/${slug}/${competitionId}/entrylist.json`),
+    enabled: !!slug && !!competitionId,
     staleTime: 60_000,
   })
 }
