@@ -45,6 +45,7 @@ export { RoundResults, RoundSessionResults } from './components/competitions/Rou
 export { EntryList } from './components/competitions/EntryList.jsx'
 export { RegisterButton } from './components/competitions/RegisterButton.jsx'
 export { RegistrationPanel } from './components/competitions/RegistrationPanel.jsx'
+export { CompetitionResultsTabs } from './components/competitions/CompetitionResultsTabs.jsx'
 
 // Hooks — Dashboard
 export { useDriverStats } from './hooks/useDriverStats.js'

@@ -133,15 +133,17 @@ All competition detail hooks accept `options.partnerSlug` to override the provid
 
 ```jsx
 import {
-  CompetitionCards, CompetitionCard, StandingsTable, RoundResults,
-  RoundSessionResults, EntryList, RegisterButton, RegistrationPanel,
+  CompetitionCards, CompetitionCard, CompetitionResultsTabs,
+  StandingsTable, RoundResults, RoundSessionResults,
+  EntryList, RegisterButton, RegistrationPanel,
 } from '@pitvox/partner-react'
 import '@pitvox/partner-react/styles.css'
 ```
 
+- **`<CompetitionResultsTabs>`** — Tabbed results view for a competition. Championships show a "Standings" tab (default) plus one tab per finalized round. Series/Events show round tabs only, defaulting to the most recent. Self-contained — fetches all data via hooks. Props: `competitionId`, `className`.
 - **`<CompetitionCards>`** — Card grid with posters, type badges, schedule, registration status. Bundles its own CSS grid layout.
 - **`<CompetitionCard>`** — Individual competition card. Use this when you want to control the grid layout yourself (e.g. with Tailwind). Props: `comp`, `onSelect`, `onRegister`.
-- **`<StandingsTable>`** — Championship standings with per-round breakdowns, podium highlights
+- **`<StandingsTable>`** — Championship standings with per-round breakdowns and per-position podium cell highlighting
 - **`<RoundResults>`** — Standalone round results (fetches data, renders header + sessions)
 - **`<RoundSessionResults>`** — Session tabs + results table (data-prop driven, no fetch)
 - **`<EntryList>`** — Registered drivers grid with avatars

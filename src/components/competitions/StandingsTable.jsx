@@ -100,7 +100,9 @@ function StandingsRow({ driver, finalizedRounds }) {
           <td
             key={r.roundNumber}
             className={`pvx-td pvx-td--center pvx-hidden-below-md ${
-              !isDropped && result?.position <= 3 ? 'pvx-standings-cell--podium' : ''
+              !isDropped && result?.position === 1 ? 'pvx-standings-cell--p1' :
+              !isDropped && result?.position === 2 ? 'pvx-standings-cell--p2' :
+              !isDropped && result?.position === 3 ? 'pvx-standings-cell--p3' : ''
             }`}
           >
             {result ? (
