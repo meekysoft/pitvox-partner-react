@@ -18,17 +18,20 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "release": "release-it"
   },
   "peerDependencies": {
+    "@tanstack/react-query": "^5.0.0",
     "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0",
-    "@tanstack/react-query": "^5.0.0"
+    "react-dom": "^18.0.0 || ^19.0.0"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.6",
+    "@tanstack/react-query": "^5.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "@tanstack/react-query": "^5.0.0",
+    "release-it": "^19.2.4",
     "vite": "^6.0.0"
   },
   "keywords": [
