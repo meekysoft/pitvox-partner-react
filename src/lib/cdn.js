@@ -16,14 +16,19 @@ export async function fetchCdnJson(cdnUrl, path) {
 }
 
 /**
- * Build a leaderboard CDN path, with optional partner scoping.
+ * Build a game-first leaderboard CDN path, with optional partner scoping.
  * @param {string|null} partnerSlug
- * @param  {...string} segments - Path segments after the leaderboard prefix
+ * @param {string} game - Game identifier ('acc', 'evo', 'lmu')
+ * @param {string|null} [gameVersion] - Version for versioned games (EVO, LMU)
+ * @param  {...string} segments - Path segments after the game/version prefix
  * @returns {string}
  */
-export function buildLeaderboardPath(partnerSlug, ...segments) {
-  const prefix = partnerSlug ? `leaderboards/partners/${partnerSlug}` : 'leaderboards'
-  return [prefix, ...segments].join('/')
+export function buildLeaderboardPath(partnerSlug, game, gameVersion, ...segments) {
+  const parts = ['leaderboards']
+  if (partnerSlug) parts.push(`partners/${partnerSlug}`)
+  if (game) parts.push(game)
+  if (gameVersion) parts.push(`v/${gameVersion}`)
+  return [...parts, ...segments].join('/')
 }
 
 /**

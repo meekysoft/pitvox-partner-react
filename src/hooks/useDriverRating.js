@@ -10,13 +10,12 @@ import { fetchCdnJson, buildLeaderboardPath } from '../lib/cdn.js'
  */
 function useRatingsQuery(options = {}) {
   const { cdnUrl, partnerSlug } = usePitVox()
-  const { gameVersion, enabled = true } = options
+  const { game, gameVersion, enabled = true } = options
 
-  const versionSegment = gameVersion ? `v/${gameVersion}/` : ''
-  const path = buildLeaderboardPath(partnerSlug, `${versionSegment}ratings.json`)
+  const path = buildLeaderboardPath(partnerSlug, game, gameVersion, 'ratings.json')
 
   return useQuery({
-    queryKey: ['pitvox', 'ratings', partnerSlug, gameVersion || null],
+    queryKey: ['pitvox', 'ratings', partnerSlug, game || null, gameVersion || null],
     queryFn: () => fetchCdnJson(cdnUrl, path),
     staleTime: 30_000,
     refetchInterval: 30_000,
@@ -60,7 +59,8 @@ export function useDriverRating(steamId) {
  * Fetch all driver ratings for the rankings table.
  *
  * @param {object} [options]
- * @param {string} [options.gameVersion] - EVO version filter (null/undefined for ACC)
+ * @param {string} [options.game] - Game identifier ('acc', 'evo', 'lmu')
+ * @param {string} [options.gameVersion] - Version for versioned games (EVO, LMU)
  * @param {boolean} [options.enabled] - Whether to enable the query (default true)
  * @returns {{ data: object|null, isLoading: boolean, error: Error|null }}
  */

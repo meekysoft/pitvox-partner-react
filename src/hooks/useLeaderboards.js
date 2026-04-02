@@ -16,7 +16,7 @@ export function useLeaderboardIndex(options = {}) {
   const { cdnUrl, partnerSlug } = usePitVox()
   const { game, gameVersion } = options
 
-  const path = buildLeaderboardPath(partnerSlug, 'index.json')
+  const path = buildLeaderboardPath(partnerSlug, null, null, 'index.json')
 
   const query = useQuery({
     queryKey: ['pitvox', 'leaderboards', partnerSlug, 'index'],
@@ -72,19 +72,18 @@ export function useLeaderboardIndex(options = {}) {
  * @param {string} [layout] - Track layout (null/undefined → 'default')
  * @param {object} [options]
  * @param {string} [options.carId] - Filter to specific car (Layer 3 mode)
- * @param {string} [options.game] - Filter by game
- * @param {string} [options.gameVersion] - EVO version for versioned CDN paths
+ * @param {string} [options.game] - Game identifier for CDN path ('acc', 'evo', 'lmu')
+ * @param {string} [options.gameVersion] - Version for versioned CDN paths (EVO, LMU)
  */
 export function useTrackLeaderboard(trackId, layout, options = {}) {
   const { cdnUrl, partnerSlug } = usePitVox()
   const { carId, game, gameVersion } = options
 
   const layoutKey = layout || 'default'
-  const versionSegment = gameVersion ? `v/${gameVersion}/` : ''
-  const path = buildLeaderboardPath(partnerSlug, `${versionSegment}tracks/${trackId}/${layoutKey}.json`)
+  const path = buildLeaderboardPath(partnerSlug, game, gameVersion, `tracks/${trackId}/${layoutKey}.json`)
 
   const { data: rawData, isLoading, error } = useQuery({
-    queryKey: ['pitvox', 'leaderboards', partnerSlug, 'track', trackId, layoutKey, gameVersion],
+    queryKey: ['pitvox', 'leaderboards', partnerSlug, 'track', trackId, layoutKey, game, gameVersion],
     queryFn: () => fetchCdnJson(cdnUrl, path),
     enabled: !!trackId,
     staleTime: 30_000,
@@ -231,8 +230,8 @@ export function useCarMetadata() {
   const { cdnUrl } = usePitVox()
 
   const { data } = useQuery({
-    queryKey: ['pitvox', 'cars', 'index'],
-    queryFn: () => fetchCdnJson(cdnUrl, 'cars/index.json'),
+    queryKey: ['pitvox', 'cars', 'evo'],
+    queryFn: () => fetchCdnJson(cdnUrl, 'cars/evo.json'),
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
   })
