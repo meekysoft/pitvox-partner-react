@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0] - 2026-04-10
+
+### Changed
+- **BREAKING:** `useDriverLaps` now fetches a per-(driver, track, layout) CDN file instead of a single per-driver file. The hook signature is unchanged but the underlying CDN layout has moved to `laps/{userId}/{trackId}/{layout}.json` (and `laps/partners/{slug}/{userId}/{trackId}/{layout}.json` for partner mode). Driver totals, breakdowns, records and best ranking now live in a separate index file at `laps/{userId}/index.json`.
+- **BREAKING:** `buildLapsPath(partnerSlug, userId)` is now `buildLapsPath(partnerSlug, userId, trackId, layout)`. Callers building paths manually must pass the track + layout.
+- `useDriverStats` now fetches the new driver index file (`laps/{steamId}/index.json`); return shape is unchanged.
+
+### Added
+- `buildDriverIndexPath(partnerSlug, userId)` path builder for the new driver index file. Exported from the package root.
+
+### Fixed
+- Driver lap history (Layer 4) no longer silently drops laps when a driver has more than 500 leaderboard-eligible laps total. Previously, the per-driver CDN file was capped at the 500 most recent laps, causing record-holder laps on combos a driver hadn't run recently to disappear from the drill-down. Each per-(track, layout) file now holds up to 2000 laps, more than enough for any realistic combo.
+
 ## 0.6.8 (2026-04-02)
 
 All notable changes to this project will be documented in this file.

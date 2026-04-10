@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { usePitVox } from '../provider.jsx'
-import { fetchCdnJson } from '../lib/cdn.js'
+import { fetchCdnJson, buildDriverIndexPath } from '../lib/cdn.js'
 
 /**
  * Fetch a driver's global stats, records, and ranking from CDN.
- * Uses the global (non-partner-scoped) laps file so stats reflect
+ * Uses the global (non-partner-scoped) driver index file so stats reflect
  * all of the driver's activity, not just partner-affiliated laps.
  *
  * @param {string} steamId - Driver's Steam ID
@@ -14,8 +14,8 @@ export function useDriverStats(steamId) {
   const { cdnUrl } = usePitVox()
 
   const query = useQuery({
-    queryKey: ['pitvox', 'laps', 'global', steamId],
-    queryFn: () => fetchCdnJson(cdnUrl, `laps/${steamId}.json`),
+    queryKey: ['pitvox', 'laps', 'global', steamId, 'index'],
+    queryFn: () => fetchCdnJson(cdnUrl, buildDriverIndexPath(null, steamId)),
     enabled: !!steamId,
     staleTime: 30_000,
     refetchInterval: 30_000,

@@ -32,15 +32,35 @@ export function buildLeaderboardPath(partnerSlug, game, gameVersion, ...segments
 }
 
 /**
- * Build a laps CDN path, with optional partner scoping.
+ * Build a per-(driver, track, layout) laps CDN path, with optional partner scoping.
+ * Each file contains all of the driver's eligible laps for that specific track + layout.
+ *
+ * @param {string|null} partnerSlug
+ * @param {string} userId
+ * @param {string} trackId
+ * @param {string|null} [layout] - Track layout (null/undefined → 'default')
+ * @returns {string}
+ */
+export function buildLapsPath(partnerSlug, userId, trackId, layout) {
+  const layoutKey = layout || 'default'
+  return partnerSlug
+    ? `laps/partners/${partnerSlug}/${userId}/${trackId}/${layoutKey}.json`
+    : `laps/${userId}/${trackId}/${layoutKey}.json`
+}
+
+/**
+ * Build a driver index CDN path (totals, breakdowns, records, ranking).
+ * Companion to {@link buildLapsPath}; the index aggregates a driver's stats
+ * across all combos and is small and cheap to fetch.
+ *
  * @param {string|null} partnerSlug
  * @param {string} userId
  * @returns {string}
  */
-export function buildLapsPath(partnerSlug, userId) {
+export function buildDriverIndexPath(partnerSlug, userId) {
   return partnerSlug
-    ? `laps/partners/${partnerSlug}/${userId}.json`
-    : `laps/${userId}.json`
+    ? `laps/partners/${partnerSlug}/${userId}/index.json`
+    : `laps/${userId}/index.json`
 }
 
 /**

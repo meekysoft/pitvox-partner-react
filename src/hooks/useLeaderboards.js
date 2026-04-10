@@ -126,7 +126,11 @@ export function useTrackLeaderboard(trackId, layout, options = {}) {
 }
 
 /**
- * Fetch a driver's full lap history from CDN, filtered to a specific track/car.
+ * Fetch a driver's lap history for a specific track/layout from CDN, filtered to a car.
+ *
+ * Each (driver, track, layout) combo lives in its own CDN file, so this hook
+ * fetches only the laps relevant to the current drill-down. Game / version /
+ * car / validity filters are applied client-side from the file's contents.
  *
  * @param {string} userId - Driver's steamId or userId
  * @param {string} trackId
@@ -141,12 +145,13 @@ export function useDriverLaps(userId, trackId, layout, carId, options = {}) {
   const { cdnUrl, partnerSlug } = usePitVox()
   const { showInvalid = false, game, gameVersion } = options
 
-  const path = buildLapsPath(partnerSlug, userId)
+  const path = userId && trackId ? buildLapsPath(partnerSlug, userId, trackId, layout) : null
+  const layoutKey = layout || 'default'
 
   const query = useQuery({
-    queryKey: ['pitvox', 'laps', partnerSlug, userId],
+    queryKey: ['pitvox', 'laps', partnerSlug, userId, trackId, layoutKey],
     queryFn: () => fetchCdnJson(cdnUrl, path),
-    enabled: !!userId,
+    enabled: !!userId && !!trackId,
     staleTime: 30_000,
     refetchInterval: 30_000,
   })
@@ -156,12 +161,6 @@ export function useDriverLaps(userId, trackId, layout, carId, options = {}) {
 
     return query.data.laps
       .filter((lap) => {
-        if (lap.trackId !== trackId) return false
-        if (layout) {
-          if (lap.trackLayout !== layout) return false
-        } else {
-          if (lap.trackLayout && lap.trackLayout !== 'default') return false
-        }
         if (lap.carId !== carId) return false
         if (game && lap.game !== game) return false
         if (gameVersion && lap.gameVersion !== gameVersion) return false
@@ -169,7 +168,7 @@ export function useDriverLaps(userId, trackId, layout, carId, options = {}) {
         return true
       })
       .sort((a, b) => a.lapTimeMs - b.lapTimeMs)
-  }, [query.data?.laps, trackId, layout, carId, game, gameVersion, showInvalid])
+  }, [query.data?.laps, carId, game, gameVersion, showInvalid])
 
   // Theoretical best lap = sum of best individual sectors across all valid laps
   const theoreticalBest = useMemo(() => {

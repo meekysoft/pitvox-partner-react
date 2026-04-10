@@ -81,7 +81,7 @@ export {
 } from './components/competitions/shared.jsx'
 
 // CDN utilities
-export { fetchCdnJson, buildLeaderboardPath, buildLapsPath, buildRecentLapsPath } from './lib/cdn.js'
+export { fetchCdnJson, buildLeaderboardPath, buildLapsPath, buildDriverIndexPath, buildRecentLapsPath } from './lib/cdn.js'
 
 // Utilities
 export {
