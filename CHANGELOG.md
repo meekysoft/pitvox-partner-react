@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.7.1](https://github.com/meekysoft/pitvox-partner-react/compare/v0.6.8...v0.7.1) (2026-04-10)
+
 ## [0.7.0] - 2026-04-10
 
 ### Changed
