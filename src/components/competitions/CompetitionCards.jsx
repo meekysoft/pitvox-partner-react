@@ -18,7 +18,9 @@ import {
   formatScheduleDate,
   CompLoadingState,
   CompEmptyState,
+  getCompetitionStatus,
 } from './shared.jsx'
+import { CompletedBadge } from './CompletedBadge.jsx'
 
 export function CompetitionCards({ competitions, isLoading, onSelect, onRegister, className }) {
   if (isLoading) {
@@ -54,6 +56,9 @@ export function CompetitionCard({ comp, onSelect, onRegister }) {
   const nextRound = comp.rounds?.find((r) => r.startTime && new Date(r.startTime) >= now)
   const totalRounds = comp.rounds?.length || 0
   const finalizedCount = comp.rounds?.filter((r) => r.isFinalized).length || 0
+  const status = getCompetitionStatus(comp)
+  const isCompleted = status === 'recently-completed' || status === 'archived'
+  const isChampionship = comp.type === 'championship'
 
   return (
     <div
@@ -116,8 +121,13 @@ export function CompetitionCard({ comp, onSelect, onRegister }) {
           )}
         </div>
 
-        {/* Registration section with actionable button */}
-        {reg && (
+        {/* Completed podium (championships only — event/series don't have standings) */}
+        {isCompleted && isChampionship && (
+          <CompletedBadge competitionId={comp.id} />
+        )}
+
+        {/* Registration section — hidden for completed competitions */}
+        {reg && !isCompleted && (
           <RegistrationSection
             competitionId={comp.id}
             regOpen={regOpen}

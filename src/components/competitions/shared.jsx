@@ -124,3 +124,78 @@ export function CompLoadingState({ message = 'Loading...' }) {
 export function CompEmptyState({ message = 'No data available.' }) {
   return <div className="pvx-empty"><p>{message}</p></div>
 }
+
+// ─── Completion status helpers ────────────────────────────────────────────
+
+/**
+ * Default grace period (days) after the final round during which a completed
+ * competition is considered "recently completed" and still surfaced in the
+ * default (active) view.
+ */
+export const DEFAULT_COMPLETION_GRACE_DAYS = 3
+
+/**
+ * Returns true if the competition has rounds and every round is finalised.
+ * Admin-controlled and therefore the source of truth for "this competition
+ * is done".
+ */
+export function isCompetitionComplete(comp) {
+  const rounds = comp?.rounds
+  if (!rounds?.length) return false
+  return rounds.every((r) => r.isFinalized)
+}
+
+/**
+ * Returns the latest round's startTime as a Date (or null). Useful as the
+ * completion timestamp for grace-period calculations.
+ */
+export function getCompletionDate(comp) {
+  const rounds = comp?.rounds
+  if (!rounds?.length) return null
+  let latest = null
+  for (const r of rounds) {
+    if (!r.startTime) continue
+    const d = new Date(r.startTime)
+    if (isNaN(d)) continue
+    if (!latest || d > latest) latest = d
+  }
+  return latest
+}
+
+/**
+ * Classify a competition as 'active', 'recently-completed', or 'archived'.
+ * - 'active': still has unfinalised rounds (or no rounds yet)
+ * - 'recently-completed': all rounds finalised within the last `graceDays`
+ * - 'archived': all rounds finalised longer ago than `graceDays`
+ */
+export function getCompetitionStatus(comp, graceDays = DEFAULT_COMPLETION_GRACE_DAYS) {
+  if (!isCompetitionComplete(comp)) return 'active'
+  const completedAt = getCompletionDate(comp)
+  if (!completedAt) return 'recently-completed'
+  const graceMs = graceDays * 24 * 60 * 60 * 1000
+  return (Date.now() - completedAt.getTime()) <= graceMs
+    ? 'recently-completed'
+    : 'archived'
+}
+
+/**
+ * Filter a list of competitions to those whose status is in `statuses`.
+ */
+export function filterCompetitionsByStatus(competitions, statuses, graceDays = DEFAULT_COMPLETION_GRACE_DAYS) {
+  if (!competitions?.length) return []
+  const allowed = new Set(Array.isArray(statuses) ? statuses : [statuses])
+  return competitions.filter((c) => allowed.has(getCompetitionStatus(c, graceDays)))
+}
+
+/**
+ * Extract the top N drivers from a standings payload (shape:
+ * { standings: [{ position, driverName, nation, totalPoints, ... }, ...] }).
+ * Returns an empty array if standings aren't available.
+ */
+export function getCompetitionPodium(standings, topN = 3) {
+  const list = standings?.standings
+  if (!Array.isArray(list)) return []
+  return [...list]
+    .sort((a, b) => (a.position ?? 999) - (b.position ?? 999))
+    .slice(0, topN)
+}

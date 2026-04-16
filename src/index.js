@@ -46,6 +46,7 @@ export { EntryList } from './components/competitions/EntryList.jsx'
 export { RegisterButton } from './components/competitions/RegisterButton.jsx'
 export { RegistrationPanel } from './components/competitions/RegistrationPanel.jsx'
 export { CompetitionResultsTabs } from './components/competitions/CompetitionResultsTabs.jsx'
+export { CompletedBadge } from './components/competitions/CompletedBadge.jsx'
 
 // Hooks — Dashboard
 export { useDriverStats } from './hooks/useDriverStats.js'
@@ -78,6 +79,12 @@ export {
   PODIUM_MEDALS,
   CompLoadingState,
   CompEmptyState,
+  DEFAULT_COMPLETION_GRACE_DAYS,
+  isCompetitionComplete,
+  getCompletionDate,
+  getCompetitionStatus,
+  filterCompetitionsByStatus,
+  getCompetitionPodium,
 } from './components/competitions/shared.jsx'
 
 // CDN utilities
