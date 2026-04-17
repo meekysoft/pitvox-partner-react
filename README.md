@@ -141,8 +141,9 @@ import '@pitvox/partner-react/styles.css'
 ```
 
 - **`<CompetitionResultsTabs>`** — Tabbed results view for a competition. Championships show a "Standings" tab (default) plus one tab per finalized round. Series/Events show round tabs only, defaulting to the most recent. Self-contained — fetches all data via hooks. Props: `competitionId`, `className`.
-- **`<CompetitionCards>`** — Card grid with posters, type badges, schedule, registration status. Bundles its own CSS grid layout.
+- **`<CompetitionCards>`** — Card grid with posters, type badges, schedule, registration status. Bundles its own CSS grid layout. Completed championships automatically show a podium badge and hide the registration section.
 - **`<CompetitionCard>`** — Individual competition card. Use this when you want to control the grid layout yourself (e.g. with Tailwind). Props: `comp`, `onSelect`, `onRegister`.
+- **`<CompletedBadge>`** — Podium winners badge for completed championships. Fetches standings automatically. Props: `competitionId`, `topN` (default 3), `label` (default "Completed"), `className`.
 - **`<StandingsTable>`** — Championship standings with per-round breakdowns and per-position podium cell highlighting
 - **`<RoundResults>`** — Standalone round results (fetches data, renders header + sessions)
 - **`<RoundSessionResults>`** — Session tabs + results table (data-prop driven, no fetch)
@@ -155,8 +156,23 @@ import '@pitvox/partner-react/styles.css'
 Useful when composing competition pages:
 
 ```jsx
-import { TypeBadge, InfoPill, PODIUM_MEDALS, CompLoadingState, CompEmptyState } from '@pitvox/partner-react'
+import {
+  TypeBadge, InfoPill, PODIUM_MEDALS, CompLoadingState, CompEmptyState,
+  isCompetitionComplete, getCompletionDate, getCompetitionStatus,
+  filterCompetitionsByStatus, getCompetitionPodium,
+  DEFAULT_COMPLETION_GRACE_DAYS,
+} from '@pitvox/partner-react'
 ```
+
+**`isCompetitionComplete(comp)`** — Returns `true` if all rounds are finalised.
+
+**`getCompletionDate(comp)`** — Returns the latest round's `startTime` as a `Date` (or `null`).
+
+**`getCompetitionStatus(comp, graceDays?)`** — Returns `'active'` | `'recently-completed'` | `'archived'`. A competition is "recently completed" for `graceDays` (default 3) after its final round, then becomes "archived".
+
+**`filterCompetitionsByStatus(competitions, statuses, graceDays?)`** — Filter a list by one or more statuses.
+
+**`getCompetitionPodium(standings, topN?)`** — Extract the top N drivers from a standings payload.
 
 ## Driver Dashboard
 
@@ -334,6 +350,7 @@ import {
   formatRelativeTime,  // ISO string → "2h ago"
   formatDelta,         // 542 → "+0.542"
   formatTyreCompound,           // "SR" → "Soft Race"
+  formatFuel,                   // 27.822 → "27.8L", 50 → "50L", null → "-"
   formatNotificationMessage,    // notification → "X beat your record on Track — Car"
 } from '@pitvox/partner-react'
 ```
