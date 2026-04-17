@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { formatLapTime, formatSectorTime, formatCarName, formatDate, formatTyreCompound } from '../../utils/format.js'
+import { formatLapTime, formatSectorTime, formatCarName, formatDate, formatTyreCompound, formatFuel } from '../../utils/format.js'
 import {
   useSortConfig, sortEntries, calcBestSectors,
   SortTh, DriverCell, RankBadge, Breadcrumb, EmptyState, LoadingState,
@@ -86,7 +86,7 @@ export function DriversTable({ entries, isLoading, track, carId, getUserDisplay,
                     <td className={`pvx-td pvx-td--mono pvx-td--sector pvx-hidden-below-sm ${isBestS2 ? 'pvx-td--best-sector' : ''}`}>{formatSectorTime(entry.sector2Ms)}</td>
                     <td className={`pvx-td pvx-td--mono pvx-td--sector pvx-hidden-below-sm ${isBestS3 ? 'pvx-td--best-sector' : ''}`}>{formatSectorTime(entry.sector3Ms)}</td>
                     <td className="pvx-td pvx-td--center pvx-hidden-below-lg" title={formatTyreCompound(entry.tyreCompound)}>{entry.tyreCompound || '-'}</td>
-                    <td className="pvx-td pvx-td--center pvx-hidden-below-xl">{entry.startingFuelL ? `${entry.startingFuelL}L` : '-'}</td>
+                    <td className="pvx-td pvx-td--center pvx-hidden-below-xl">{formatFuel(entry.startingFuelL)}</td>
                     <td className="pvx-td pvx-td--center pvx-hidden-below-lg">{entry.lapCount || '-'}</td>
                     <td className="pvx-td pvx-td--muted pvx-hidden-below-xl">{entry.recordedAt ? formatDate(entry.recordedAt) : '-'}</td>
                   </tr>

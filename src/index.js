@@ -100,5 +100,6 @@ export {
   formatRelativeTime,
   formatDelta,
   formatTyreCompound,
+  formatFuel,
   formatNotificationMessage,
 } from './utils/format.js'

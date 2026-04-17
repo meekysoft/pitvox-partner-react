@@ -170,3 +170,10 @@ export function formatTyreCompound(code) {
   }
   return compounds[code] || code
 }
+
+export function formatFuel(value) {
+  if (!value) return '-'
+  const n = Number(value)
+  if (isNaN(n)) return '-'
+  return n % 1 ? `${n.toFixed(1)}L` : `${n}L`
+}

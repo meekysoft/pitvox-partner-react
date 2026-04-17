@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { formatLapTime, formatSectorTime, formatCarName, formatDate, formatTyreCompound } from '../../utils/format.js'
+import { formatLapTime, formatSectorTime, formatCarName, formatDate, formatTyreCompound, formatFuel } from '../../utils/format.js'
 import { useDriverLaps } from '../../hooks/useLeaderboards.js'
 import { calcBestSectors, Breadcrumb, EmptyState, LoadingState, CheckIcon, CrossIcon } from './shared.jsx'
 
@@ -111,7 +111,7 @@ export function LapHistoryTable({ userId, track, carId, game, gameVersion, showI
                       {lap.isValid ? <CheckIcon /> : <CrossIcon />}
                     </td>
                     <td className="pvx-td pvx-td--center pvx-hidden-below-lg" title={formatTyreCompound(lap.tyreCompound)}>{lap.tyreCompound || '-'}</td>
-                    <td className="pvx-td pvx-td--center pvx-hidden-below-lg">{lap.startingFuelL ? `${lap.startingFuelL}L` : '-'}</td>
+                    <td className="pvx-td pvx-td--center pvx-hidden-below-lg">{formatFuel(lap.startingFuelL)}</td>
                     <td className="pvx-td pvx-td--muted pvx-hidden-below-xl">{formatDate(lap.timestamp)}</td>
                   </tr>
                 )
