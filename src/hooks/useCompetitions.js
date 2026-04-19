@@ -116,6 +116,29 @@ export function useCompetitionAllRounds(competitionId, roundNumbers = [], option
  * @param {object} [options]
  * @param {string} [options.partnerSlug] - Override partner slug
  */
+/**
+ * Fetch per-driver lap detail for a round from CDN.
+ * Returns null gracefully if no lap data exists (e.g. manual-import rounds).
+ *
+ * @param {string} competitionId
+ * @param {number} roundNumber
+ * @param {object} [options]
+ * @param {string} [options.partnerSlug] - Override partner slug
+ */
+export function useCompetitionRoundLaps(competitionId, roundNumber, options = {}) {
+  const ctx = usePitVox()
+  const slug = options.partnerSlug || ctx.partnerSlug
+
+  return useQuery({
+    queryKey: ['pitvox', 'competition', slug, competitionId, 'round', roundNumber, 'laps'],
+    queryFn: () =>
+      fetchCdnJson(ctx.cdnUrl, `competitions/${slug}/${competitionId}/rounds/${roundNumber}/laps.json`)
+        .catch(() => null),
+    enabled: !!slug && !!competitionId && roundNumber != null,
+    staleTime: 60_000,
+  })
+}
+
 export function useCompetitionEntryList(competitionId, options = {}) {
   const ctx = usePitVox()
   const slug = options.partnerSlug || ctx.partnerSlug

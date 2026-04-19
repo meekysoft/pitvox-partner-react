@@ -20,6 +20,7 @@ export {
   useCompetitionRound,
   useCompetitionAllRounds,
   useCompetitionEntryList,
+  useCompetitionRoundLaps,
 } from './hooks/useCompetitions.js'
 
 // Hooks — Registration

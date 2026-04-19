@@ -13,7 +13,7 @@
  */
 
 import { useState } from 'react'
-import { useCompetitionRound } from '../../hooks/useCompetitions.js'
+import { useCompetitionRound, useCompetitionRoundLaps } from '../../hooks/useCompetitions.js'
 import { formatCarName } from '../../utils/format.js'
 import {
   CompRankBadge,
@@ -76,7 +76,7 @@ export function RoundResults({ competitionId, roundNumber, className }) {
         )}
       </div>
 
-      <RoundSessionResults round={round} />
+      <RoundSessionResults round={round} competitionId={competitionId} />
     </div>
   )
 }
@@ -87,9 +87,10 @@ export function RoundResults({ competitionId, roundNumber, className }) {
  *
  * @param {object} props
  * @param {object} props.round - Round data object with sessions array
+ * @param {string} [props.competitionId] - If provided, enables per-driver lap detail (fetched from CDN)
  * @param {string} [props.className]
  */
-export function RoundSessionResults({ round, className }) {
+export function RoundSessionResults({ round, competitionId, className }) {
   const [activeSession, setActiveSession] = useState(null)
 
   const sessions = round?.sessions || []
@@ -97,11 +98,19 @@ export function RoundSessionResults({ round, className }) {
     return <CompEmptyState message="No session data for this round." />
   }
 
+  // Fetch per-driver lap detail if competitionId is provided
+  const { data: lapData } = useCompetitionRoundLaps(
+    competitionId, round?.roundNumber, { enabled: !!competitionId }
+  )
+
   const effectiveSession = activeSession
     || sessions.find((s) => s.type === 'RACE')?.type
     || sessions[0]?.type
 
   const currentSession = sessions.find((s) => s.type === effectiveSession) || sessions[0]
+
+  // Find lap data for the current session type
+  const sessionLaps = lapData?.sessions?.find((s) => s.type === effectiveSession)?.drivers || null
 
   return (
     <div className={className || ''}>
@@ -111,21 +120,23 @@ export function RoundSessionResults({ round, className }) {
         onSelect={setActiveSession}
       />
 
-      <SessionResultsTable session={currentSession} />
+      <SessionResultsTable session={currentSession} sessionLaps={sessionLaps} />
     </div>
   )
 }
 
 // ─── Internal components ────────────────────────────────────────
 
-function SessionResultsTable({ session }) {
+function SessionResultsTable({ session, sessionLaps }) {
   const isRace = session.type === 'RACE'
+  const [expandedDriver, setExpandedDriver] = useState(null)
 
   if (!session.results?.length) {
     return <CompEmptyState message={`No results for ${session.type}.`} />
   }
 
   const fastestSplits = calcFastestSplits(session.results)
+  const colCount = isRace ? 7 : 4
 
   return (
     <div className="pvx-table-scroll">
@@ -146,68 +157,134 @@ function SessionResultsTable({ session }) {
           </tr>
         </thead>
         <tbody className="pvx-tbody">
-          {session.results.map((result, index) => (
-            <SessionResultRow
-              key={result.driverId || index}
-              result={result}
-              isRace={isRace}
-              fastestSplits={fastestSplits}
-              rowIndex={index}
-            />
-          ))}
+          {session.results.map((result, index) => {
+            const driverLaps = sessionLaps?.[result.driverId]?.laps
+            const isExpanded = expandedDriver === result.driverId && !!driverLaps
+            return (
+              <SessionResultRow
+                key={result.driverId || index}
+                result={result}
+                isRace={isRace}
+                fastestSplits={fastestSplits}
+                rowIndex={index}
+                hasLapDetail={!!driverLaps}
+                isExpanded={isExpanded}
+                onToggle={() => setExpandedDriver(isExpanded ? null : result.driverId)}
+                driverLaps={isExpanded ? driverLaps : null}
+                colCount={colCount}
+              />
+            )
+          })}
         </tbody>
       </table>
     </div>
   )
 }
 
-function SessionResultRow({ result, isRace, fastestSplits, rowIndex }) {
+function SessionResultRow({ result, isRace, fastestSplits, rowIndex, hasLapDetail, isExpanded, onToggle, driverLaps, colCount }) {
   const isTopThree = result.position <= 3
 
   return (
-    <tr className={`pvx-row ${isTopThree ? 'pvx-row--podium' : ''}`}>
-      <td className="pvx-td">
-        <CompRankBadge position={result.position} />
-      </td>
-      <td className="pvx-td pvx-td--primary">
-        <NationFlag nation={result.nation} />
-        {result.driverName}
-        {result.carNumber != null && (
-          <span className="pvx-car-number">#{result.carNumber}</span>
+    <>
+      <tr
+        className={`pvx-row ${isTopThree ? 'pvx-row--podium' : ''} ${hasLapDetail ? 'pvx-row--expandable' : ''}`}
+        onClick={hasLapDetail ? onToggle : undefined}
+        style={hasLapDetail ? { cursor: 'pointer' } : undefined}
+      >
+        <td className="pvx-td">
+          <CompRankBadge position={result.position} />
+        </td>
+        <td className="pvx-td pvx-td--primary">
+          <NationFlag nation={result.nation} />
+          {result.driverName}
+          {result.carNumber != null && (
+            <span className="pvx-car-number">#{result.carNumber}</span>
+          )}
+          {result.penalty && (
+            <span className="pvx-penalty">{result.penalty}</span>
+          )}
+          {hasLapDetail && (
+            <span className={`pvx-expand-indicator ${isExpanded ? 'pvx-expand-indicator--open' : ''}`}>
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor" style={{ transition: 'transform 0.15s', transform: isExpanded ? 'rotate(180deg)' : 'none' }}>
+                <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+              </svg>
+            </span>
+          )}
+        </td>
+        <td className="pvx-td pvx-hidden-below-sm">
+          {formatCarName(result.carId)}
+        </td>
+        <td className="pvx-td pvx-td--mono">
+          <BestLapCell
+            bestLap={result.bestLapFormatted}
+            hasBestLap={result.hasBestLap}
+            splits={result.splits}
+            fastestSplits={fastestSplits}
+            showAbove={rowIndex <= 1}
+          />
+        </td>
+        {isRace && (
+          <>
+            <td className="pvx-td pvx-hidden-below-sm">{result.lapsCompleted}</td>
+            <td className="pvx-td pvx-td--mono pvx-td--muted pvx-hidden-below-sm">
+              {result.position === 1 ? (result.totalTime || '-') : (result.gap || '-')}
+            </td>
+            <td className="pvx-td pvx-td--center">
+              <span className="pvx-session-points">{result.points}</span>
+              {result.pointsOverride !== 0 && result.pointsOverride && (
+                <span className="pvx-points-override">
+                  ({result.pointsOverride > 0 ? '+' : ''}{result.pointsOverride})
+                </span>
+              )}
+            </td>
+          </>
         )}
-        {result.penalty && (
-          <span className="pvx-penalty">{result.penalty}</span>
-        )}
-      </td>
-      <td className="pvx-td pvx-hidden-below-sm">
-        {formatCarName(result.carId)}
-      </td>
-      <td className="pvx-td pvx-td--mono">
-        <BestLapCell
-          bestLap={result.bestLapFormatted}
-          hasBestLap={result.hasBestLap}
-          splits={result.splits}
-          fastestSplits={fastestSplits}
-          showAbove={rowIndex <= 1}
-        />
-      </td>
-      {isRace && (
-        <>
-          <td className="pvx-td pvx-hidden-below-sm">{result.lapsCompleted}</td>
-          <td className="pvx-td pvx-td--mono pvx-td--muted pvx-hidden-below-sm">
-            {result.position === 1 ? (result.totalTime || '-') : (result.gap || '-')}
+      </tr>
+      {isExpanded && driverLaps && (
+        <tr className="pvx-row pvx-row--lap-detail">
+          <td colSpan={colCount} className="pvx-td pvx-td--lap-detail">
+            <DriverLapTable laps={driverLaps} />
           </td>
-          <td className="pvx-td pvx-td--center">
-            <span className="pvx-session-points">{result.points}</span>
-            {result.pointsOverride !== 0 && result.pointsOverride && (
-              <span className="pvx-points-override">
-                ({result.pointsOverride > 0 ? '+' : ''}{result.pointsOverride})
-              </span>
-            )}
-          </td>
-        </>
+        </tr>
       )}
-    </tr>
+    </>
+  )
+}
+
+function DriverLapTable({ laps }) {
+  // Find fastest valid lap for highlighting
+  const fastestTime = Math.min(...laps.filter((l) => l.valid && l.timeMs > 0).map((l) => l.timeMs))
+
+  return (
+    <table className="pvx-table pvx-table--laps">
+      <thead>
+        <tr className="pvx-thead-row">
+          <th className="pvx-th pvx-th--narrow">Lap</th>
+          <th className="pvx-th">Time</th>
+          <th className="pvx-th pvx-hidden-below-sm">S1</th>
+          <th className="pvx-th pvx-hidden-below-sm">S2</th>
+          <th className="pvx-th pvx-hidden-below-sm">S3</th>
+        </tr>
+      </thead>
+      <tbody className="pvx-tbody">
+        {laps.map((lap) => {
+          const isFastest = lap.valid && lap.timeMs === fastestTime
+          return (
+            <tr key={lap.lap} className={`pvx-row ${!lap.valid ? 'pvx-row--invalid' : ''} ${isFastest ? 'pvx-row--fastest' : ''}`}>
+              <td className="pvx-td pvx-td--muted">{lap.lap}</td>
+              <td className="pvx-td pvx-td--mono">{lap.time}</td>
+              {(lap.splits || []).map((s, i) => (
+                <td key={i} className="pvx-td pvx-td--mono pvx-td--muted pvx-hidden-below-sm">{s}</td>
+              ))}
+              {/* Pad missing split columns */}
+              {Array.from({ length: Math.max(0, 3 - (lap.splits?.length || 0)) }).map((_, i) => (
+                <td key={`pad-${i}`} className="pvx-td pvx-hidden-below-sm" />
+              ))}
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
   )
 }
 
