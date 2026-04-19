@@ -203,13 +203,6 @@ function SessionResultRow({ result, isRace, fastestSplits, rowIndex, hasLapDetai
           {result.penalty && (
             <span className="pvx-penalty">{result.penalty}</span>
           )}
-          {hasLapDetail && (
-            <span className={`pvx-expand-indicator ${isExpanded ? 'pvx-expand-indicator--open' : ''}`}>
-              <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor" style={{ transition: 'transform 0.15s', transform: isExpanded ? 'rotate(180deg)' : 'none' }}>
-                <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-              </svg>
-            </span>
-          )}
         </td>
         <td className="pvx-td pvx-hidden-below-sm">
           {formatCarName(result.carId)}
