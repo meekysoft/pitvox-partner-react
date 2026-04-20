@@ -55,9 +55,14 @@ export function UpcomingEvents({ events, isLoading, className, limit = 3 }) {
                 })}
               </span>
               <span className="pvx-upcoming-relative">
-                {formatFutureRelative(event.startTime)}
+                {event.dediStatus === 'running'
+                  ? 'Live now'
+                  : event.dediStatus === 'provisioning'
+                    ? 'Starting...'
+                    : formatFutureRelative(event.startTime)}
               </span>
-              {event.isNext && <span className="pvx-upcoming-badge">Next</span>}
+              {event.dediStatus === 'running' && <span className="pvx-upcoming-badge pvx-upcoming-badge--live">Live</span>}
+              {!event.dediStatus && event.isNext && <span className="pvx-upcoming-badge">Next</span>}
             </div>
           </div>
         ))}
