@@ -23,6 +23,7 @@ export const TYPE_LABELS = {
   championship: 'Championship',
   series: 'Series',
   event: 'Event',
+  hotlap: 'Hotlap',
 }
 
 export const SESSION_ORDER = ['PRACTICE', 'QUALIFYING', 'RACE']
