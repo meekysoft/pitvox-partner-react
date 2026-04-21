@@ -125,6 +125,27 @@ export function useCompetitionAllRounds(competitionId, roundNumbers = [], option
  * @param {object} [options]
  * @param {string} [options.partnerSlug] - Override partner slug
  */
+/**
+ * Fetch hotlap leaderboard from CDN (aggregate best laps across all practice sessions).
+ *
+ * @param {string} competitionId
+ * @param {object} [options]
+ * @param {string} [options.partnerSlug] - Override partner slug
+ */
+export function useCompetitionLeaderboard(competitionId, options = {}) {
+  const ctx = usePitVox()
+  const slug = options.partnerSlug || ctx.partnerSlug
+
+  return useQuery({
+    queryKey: ['pitvox', 'competition', slug, competitionId, 'leaderboard'],
+    queryFn: () =>
+      fetchCdnJson(ctx.cdnUrl, `competitions/${slug}/${competitionId}/leaderboard.json`)
+        .catch(() => null),
+    enabled: !!slug && !!competitionId,
+    staleTime: 60_000,
+  })
+}
+
 export function useCompetitionRoundLaps(competitionId, roundNumber, options = {}) {
   const ctx = usePitVox()
   const slug = options.partnerSlug || ctx.partnerSlug

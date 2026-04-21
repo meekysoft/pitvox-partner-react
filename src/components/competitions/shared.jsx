@@ -27,6 +27,22 @@ export const TYPE_LABELS = {
 
 export const SESSION_ORDER = ['PRACTICE', 'QUALIFYING', 'RACE']
 
+/** Get sort order for session type, handling PRACTICE_N. */
+function getSessionSortOrder(type) {
+  const idx = SESSION_ORDER.indexOf(type)
+  if (idx >= 0) return idx
+  const match = type.match(/^PRACTICE_(\d+)$/)
+  if (match) return 100 + parseInt(match[1])
+  return 999
+}
+
+/** Format session type for display: PRACTICE_1 → "P1", QUALIFYING → "QUALIFYING" */
+export function formatSessionLabel(type) {
+  const match = type.match(/^PRACTICE_(\d+)$/)
+  if (match) return `P${match[1]}`
+  return type
+}
+
 // ─── Rank badge (reuses leaderboard pvx-rank classes) ─────────────────────
 
 export function CompRankBadge({ position }) {
@@ -52,7 +68,7 @@ export function SessionTabs({ sessions, activeSession, onSelect }) {
   if (!sessions || sessions.length <= 1) return null
 
   const sorted = [...sessions].sort(
-    (a, b) => SESSION_ORDER.indexOf(a.type) - SESSION_ORDER.indexOf(b.type)
+    (a, b) => getSessionSortOrder(a.type) - getSessionSortOrder(b.type)
   )
 
   return (
@@ -63,7 +79,7 @@ export function SessionTabs({ sessions, activeSession, onSelect }) {
           onClick={() => onSelect(s.type)}
           className={`pvx-session-tab ${activeSession === s.type ? 'pvx-session-tab--active' : ''}`}
         >
-          {s.type}
+          {formatSessionLabel(s.type)}
         </button>
       ))}
     </div>

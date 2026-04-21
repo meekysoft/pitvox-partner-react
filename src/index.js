@@ -21,6 +21,7 @@ export {
   useCompetitionAllRounds,
   useCompetitionEntryList,
   useCompetitionRoundLaps,
+  useCompetitionLeaderboard,
 } from './hooks/useCompetitions.js'
 
 // Hooks — Registration
@@ -78,6 +79,7 @@ export {
   TypeBadge,
   InfoPill,
   PODIUM_MEDALS,
+  formatSessionLabel,
   CompLoadingState,
   CompEmptyState,
   DEFAULT_COMPLETION_GRACE_DAYS,
