@@ -914,6 +914,11 @@
   color: #4ade80;
 }
 
+.pvx-comp-badge--hotlap {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
 .pvx-info-pill {
   display: inline-block;
   padding: 0.125rem 0.5rem;
