@@ -10,15 +10,20 @@
  */
 
 import { useState, useMemo } from 'react'
-import { useCompetitionConfig, useCompetitionAllRounds } from '../../hooks/useCompetitions.js'
+import { useCompetitionConfig, useCompetitionAllRounds, useCompetitionLeaderboard } from '../../hooks/useCompetitions.js'
+import { formatCarName } from '../../utils/format.js'
 import { StandingsTable } from './StandingsTable.jsx'
 import { RoundSessionResults } from './RoundResults.jsx'
-import { PODIUM_MEDALS, CompLoadingState, CompEmptyState } from './shared.jsx'
+import { PODIUM_MEDALS, CompLoadingState, CompEmptyState, CompRankBadge, NationFlag, formatSessionLabel } from './shared.jsx'
 
 export function CompetitionResultsTabs({ competitionId, className }) {
   const { data: config, isLoading: configLoading } = useCompetitionConfig(competitionId)
 
   const isChampionship = config?.type === 'championship'
+  const isHotlap = config?.type === 'hotlap'
+
+  const { data: leaderboard } = useCompetitionLeaderboard(isHotlap ? competitionId : null)
+
   const finalizedRounds = useMemo(
     () => config?.rounds?.filter((r) => r.isFinalized) || [],
     [config],
@@ -33,12 +38,18 @@ export function CompetitionResultsTabs({ competitionId, className }) {
     roundNumbers,
   )
 
-  // Default tab: "standings" for championships, latest round for others
-  const defaultTab = isChampionship
-    ? 'standings'
-    : roundNumbers.length > 0
-      ? `round-${roundNumbers[roundNumbers.length - 1]}`
-      : null
+  // For hotlap: extract session types from the single round
+  const hotlapRound = isHotlap && rounds.length > 0 ? rounds[0] : null
+  const hotlapSessions = hotlapRound?.sessions || []
+
+  // Default tab
+  const defaultTab = isHotlap
+    ? 'leaderboard'
+    : isChampionship
+      ? 'standings'
+      : roundNumbers.length > 0
+        ? `round-${roundNumbers[roundNumbers.length - 1]}`
+        : null
 
   const [activeTab, setActiveTab] = useState(null)
   const effectiveTab = activeTab || defaultTab
@@ -63,12 +74,19 @@ export function CompetitionResultsTabs({ competitionId, className }) {
   if (isChampionship) {
     tabs.push({ id: 'standings', label: 'Standings' })
   }
-  for (const fr of finalizedRounds) {
-    tabs.push({
-      id: `round-${fr.roundNumber}`,
-      label: `R${fr.roundNumber}`,
-      track: null,
-    })
+  if (isHotlap) {
+    tabs.push({ id: 'leaderboard', label: 'Leaderboard' })
+    for (const session of hotlapSessions) {
+      tabs.push({ id: `session-${session.type}`, label: formatSessionLabel(session.type) })
+    }
+  } else {
+    for (const fr of finalizedRounds) {
+      tabs.push({
+        id: `round-${fr.roundNumber}`,
+        label: `R${fr.roundNumber}`,
+        track: null,
+      })
+    }
   }
 
   const selectedRound = roundMap.get(effectiveTab)
@@ -95,8 +113,16 @@ export function CompetitionResultsTabs({ competitionId, className }) {
       {/* Tab content */}
       {effectiveTab === 'standings' ? (
         <StandingsTable competitionId={competitionId} />
+      ) : effectiveTab === 'leaderboard' ? (
+        <HotlapLeaderboard leaderboard={leaderboard} config={config} />
+      ) : effectiveTab?.startsWith('session-') ? (
+        <HotlapSessionContent
+          session={hotlapSessions.find((s) => `session-${s.type}` === effectiveTab)}
+          round={hotlapRound}
+          competitionId={competitionId}
+        />
       ) : selectedRound ? (
-        <RoundContent round={selectedRound} />
+        <RoundContent round={selectedRound} competitionId={competitionId} />
       ) : (
         <CompEmptyState message="No results for this round." />
       )}
@@ -107,7 +133,7 @@ export function CompetitionResultsTabs({ competitionId, className }) {
 /**
  * Round content panel — header with track/date/podium + session results.
  */
-function RoundContent({ round }) {
+function RoundContent({ round, competitionId }) {
   const sessions = round.sessions || []
   const raceSession = sessions.find((s) => s.type === 'RACE')
   const podium = raceSession?.results
@@ -141,7 +167,91 @@ function RoundContent({ round }) {
         )}
       </div>
 
-      <RoundSessionResults round={round} />
+      <RoundSessionResults round={round} competitionId={competitionId} />
+    </div>
+  )
+}
+
+/**
+ * Hotlap leaderboard: aggregate best lap per driver across all practice sessions.
+ */
+function HotlapLeaderboard({ leaderboard, config }) {
+  if (!leaderboard?.drivers?.length) {
+    return <CompEmptyState message="No lap times recorded yet." />
+  }
+
+  return (
+    <div className="pvx-card">
+      <div className="pvx-card-header--split">
+        <div>
+          <h4 className="pvx-card-title">
+            {leaderboard.track || config?.name || 'Hotlap Leaderboard'}
+          </h4>
+          <span className="pvx-standings-subtitle">
+            {leaderboard.sessionsCompleted} session{leaderboard.sessionsCompleted !== 1 ? 's' : ''} completed
+          </span>
+        </div>
+      </div>
+      <div className="pvx-table-scroll">
+        <table className="pvx-table">
+          <thead>
+            <tr className="pvx-thead-row">
+              <th className="pvx-th pvx-th--narrow">Pos</th>
+              <th className="pvx-th">Driver</th>
+              <th className="pvx-th pvx-hidden-below-sm">Car</th>
+              <th className="pvx-th">Best Lap</th>
+              <th className="pvx-th pvx-hidden-below-sm">Laps</th>
+              <th className="pvx-th pvx-hidden-below-sm">Sessions</th>
+              <th className="pvx-th pvx-hidden-below-sm">Gap</th>
+            </tr>
+          </thead>
+          <tbody className="pvx-tbody">
+            {leaderboard.drivers.map((driver) => {
+              const gap = driver.position === 1 ? '' :
+                `+${((driver.bestLapMs - leaderboard.drivers[0].bestLapMs) / 1000).toFixed(3)}`
+              return (
+                <tr key={driver.driverId} className={`pvx-row ${driver.position <= 3 ? 'pvx-row--podium' : ''}`}>
+                  <td className="pvx-td">
+                    <CompRankBadge position={driver.position} />
+                  </td>
+                  <td className="pvx-td pvx-td--primary">
+                    <NationFlag nation={driver.nation} />
+                    {driver.driverName}
+                  </td>
+                  <td className="pvx-td pvx-hidden-below-sm">{formatCarName(driver.carId)}</td>
+                  <td className="pvx-td pvx-td--mono">
+                    <span className={driver.position === 1 ? 'pvx-best-lap-cell--fastest' : ''}>
+                      {driver.bestLapFormatted}
+                    </span>
+                  </td>
+                  <td className="pvx-td pvx-hidden-below-sm">{driver.totalLaps}</td>
+                  <td className="pvx-td pvx-hidden-below-sm">{driver.sessionsParticipated}</td>
+                  <td className="pvx-td pvx-td--mono pvx-td--muted pvx-hidden-below-sm">{gap}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Single session content for a hotlap competition.
+ */
+function HotlapSessionContent({ session, round, competitionId }) {
+  if (!session) return <CompEmptyState message="Session data not available." />
+
+  return (
+    <div className="pvx-card">
+      <div className="pvx-card-header">
+        <h4 className="pvx-card-title">{formatSessionLabel(session.type)}</h4>
+      </div>
+      <RoundSessionResults
+        round={{ ...round, sessions: [session] }}
+        competitionId={competitionId}
+      />
     </div>
   )
 }
