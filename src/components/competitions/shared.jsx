@@ -159,6 +159,11 @@ export const DEFAULT_COMPLETION_GRACE_DAYS = 3
 export function isCompetitionComplete(comp) {
   const rounds = comp?.rounds
   if (!rounds?.length) return false
+  // For hotlap: isFinalized is set incrementally for CDN updates, so it doesn't
+  // mean the competition is over. Check that the server has actually stopped.
+  if (comp.type === 'hotlap') {
+    return rounds.every((r) => r.isFinalized && r.dediStatus === 'completed')
+  }
   return rounds.every((r) => r.isFinalized)
 }
 
