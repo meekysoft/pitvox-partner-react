@@ -109,7 +109,7 @@ export function CompetitionCard({ comp, onSelect, onRegister }) {
           {nextRound ? (
             <span className="pvx-comp-card-schedule-next">
               <span className="pvx-comp-card-schedule-label">Next:</span>{' '}
-              R{nextRound.roundNumber} {nextRound.track || 'TBD'} — {formatScheduleDate(nextRound.startTime)}
+              {comp.type !== 'hotlap' && `R${nextRound.roundNumber} `}{nextRound.track || 'TBD'} · {formatScheduleDate(nextRound.startTime)}
             </span>
           ) : totalRounds > 0 ? (
             <span className="pvx-comp-card-schedule-next">
