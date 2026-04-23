@@ -56,11 +56,20 @@ export function useUpcomingEvents() {
       const isRegistered = entryList?.drivers?.some((d) => d.steamId === steamId)
       if (!isRegistered) continue
 
-      // Find upcoming (non-finalized) rounds with future start times
+      // Find upcoming or live rounds
+      const isHotlap = comp.type === 'hotlap'
       const rounds = comp.rounds || []
       for (const round of rounds) {
-        if (round.isFinalized) continue
-        if (!round.startTime || new Date(round.startTime) <= now) continue
+        // For hotlap, isFinalized is set incrementally for CDN updates,
+        // so only skip if the server has actually stopped
+        if (round.isFinalized && (!isHotlap || round.dediStatus === 'completed')) continue
+
+        const isLive = round.dediStatus === 'running' || round.dediStatus === 'provisioning'
+        const isScheduled = round.dediStatus === 'scheduled'
+        const isFuture = round.startTime && new Date(round.startTime) > now
+        const isDediServer = isLive || isScheduled || round.dediServerAddress
+
+        if (!isLive && !isFuture && !isDediServer) continue
 
         upcoming.push({
           competitionId: comp.id,
@@ -68,12 +77,20 @@ export function useUpcomingEvents() {
           roundNumber: round.roundNumber,
           track: round.track || 'TBD',
           startTime: round.startTime,
+          dediStatus: round.dediStatus || null,
+          dediServerAddress: round.dediServerAddress || null,
         })
       }
     }
 
-    // Sort by startTime ascending
-    upcoming.sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+    // Sort: live rounds first, then by start time
+    upcoming.sort((a, b) => {
+      const aLive = a.dediStatus === 'running' || a.dediStatus === 'provisioning'
+      const bLive = b.dediStatus === 'running' || b.dediStatus === 'provisioning'
+      if (aLive && !bLive) return -1
+      if (!aLive && bLive) return 1
+      return new Date(a.startTime) - new Date(b.startTime)
+    })
 
     // Mark the first one as "next"
     if (upcoming.length > 0) {
