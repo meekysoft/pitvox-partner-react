@@ -39,8 +39,8 @@ export function TracksTable({ tracks, isLoading, carMetadata, getUserDisplay, on
         for (const rec of Object.values(track.recordByTag)) {
           if (seen.has(rec.carId)) continue
           seen.add(rec.carId)
-          const tags = carMetadata?.cars?.[rec.carId]?.tags || ['sports_car']
-          if (!matchesTagFilter(tags, activeTags)) continue
+          const tags = carMetadata?.cars?.[rec.carId]?.tags || []
+          if (!matchesTagFilter(tags, activeTags, carMetadata?.categories)) continue
           if (!best || rec.lapTimeMs < best.lapTimeMs) best = rec
         }
         if (!best) return null
@@ -78,7 +78,14 @@ export function TracksTable({ tracks, isLoading, carMetadata, getUserDisplay, on
       <div className="pvx-card-header">
         <h2 className="pvx-card-title">Track Records</h2>
       </div>
-      <TagFilterBar availableTags={availableTags} activeTags={activeTags} onToggle={toggle} onClear={clear} />
+      <TagFilterBar
+        availableTags={availableTags}
+        activeTags={activeTags}
+        onToggle={toggle}
+        onClear={clear}
+        categories={carMetadata?.categories}
+        tagLabels={carMetadata?.tagLabels}
+      />
       <div className="pvx-table-scroll">
         <table className="pvx-table">
           <thead>

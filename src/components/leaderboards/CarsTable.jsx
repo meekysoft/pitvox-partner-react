@@ -25,7 +25,7 @@ export function CarsTable({ entries, isLoading, track, carMetadata, getUserDispl
     if (!entries || !carMetadata?.tags?.length) return []
     const present = new Set()
     for (const e of entries) {
-      const tags = carMetadata.cars?.[e.carId]?.tags || ['sports_car']
+      const tags = carMetadata.cars?.[e.carId]?.tags || []
       tags.forEach((t) => present.add(t))
     }
     return carMetadata.tags.filter((t) => present.has(t))
@@ -35,8 +35,8 @@ export function CarsTable({ entries, isLoading, track, carMetadata, getUserDispl
     if (!entries) return []
     if (activeTags.size === 0) return entries
     return entries.filter((e) => {
-      const tags = carMetadata?.cars?.[e.carId]?.tags || ['sports_car']
-      return matchesTagFilter(tags, activeTags)
+      const tags = carMetadata?.cars?.[e.carId]?.tags || []
+      return matchesTagFilter(tags, activeTags, carMetadata?.categories)
     })
   }, [entries, activeTags, carMetadata])
 
@@ -62,7 +62,14 @@ export function CarsTable({ entries, isLoading, track, carMetadata, getUserDispl
       <div className="pvx-card-header">
         <Breadcrumb segments={crumbs} />
       </div>
-      <TagFilterBar availableTags={availableTags} activeTags={activeTags} onToggle={toggle} onClear={clear} />
+      <TagFilterBar
+        availableTags={availableTags}
+        activeTags={activeTags}
+        onToggle={toggle}
+        onClear={clear}
+        categories={carMetadata?.categories}
+        tagLabels={carMetadata?.tagLabels}
+      />
       {!entries?.length ? (
         <EmptyState message="No lap times for this track yet." />
       ) : (

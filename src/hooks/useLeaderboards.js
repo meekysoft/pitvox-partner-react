@@ -222,15 +222,26 @@ export function useUserLookup() {
 }
 
 /**
- * Hook for car metadata (tags) from CDN.
- * Used for tag-based filtering in leaderboard tables.
+ * Hook for car metadata + tag taxonomy from CDN.
+ *
+ * Returns tags, cars, categories and tagLabels straight from cars/{game}.json.
+ * The CDN file is the source of truth — frontends should not hardcode the
+ * category structure. Filter chips render data-driven from `categories`.
+ *
+ * @param {string} [game='evo'] - Game identifier ('evo' | 'lmu')
+ * @returns {{
+ *   tags: string[],
+ *   cars: Record<string, { displayName: string, tags: string[] }>,
+ *   categories: Array<{ id: string, label: string, tags: string[] }>,
+ *   tagLabels: Record<string, string>,
+ * }}
  */
-export function useCarMetadata() {
+export function useCarMetadata(game = 'evo') {
   const { cdnUrl } = usePitVox()
 
   const { data } = useQuery({
-    queryKey: ['pitvox', 'cars', 'evo'],
-    queryFn: () => fetchCdnJson(cdnUrl, 'cars/evo.json'),
+    queryKey: ['pitvox', 'cars', game],
+    queryFn: () => fetchCdnJson(cdnUrl, `cars/${game}.json`),
     staleTime: 5 * 60_000,
     gcTime: 30 * 60_000,
   })
@@ -238,6 +249,8 @@ export function useCarMetadata() {
   return {
     tags: data?.tags || [],
     cars: data?.cars || {},
+    categories: data?.categories || [],
+    tagLabels: data?.tagLabels || {},
   }
 }
 

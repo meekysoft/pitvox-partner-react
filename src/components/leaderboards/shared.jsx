@@ -1,23 +1,13 @@
 import { useState, useCallback, useMemo } from 'react'
 
 // ─── Tag filtering ──────────────────────────────────────────────
+//
+// Categories and labels come from the CDN's cars/{game}.json (via useCarMetadata)
+// — never hardcode them here. New tags ship by editing the telemetry-service
+// taxonomy and rolling forward; no SDK release needed.
 
-export const TAG_LABELS = {
-  formula: 'Formula', gt3: 'GT3', gt2: 'GT2', gt4: 'GT4', cup: 'Cup',
-  prototype: 'Prototype', rally: 'Rally', hypercar: 'Hypercar', supercar: 'Supercar',
-  sports_car: 'Sports Car', hot_hatch: 'Hot Hatch', lightweight: 'Lightweight',
-  '1960s': '1960s', '1970s': '1970s', '1980s': '1980s', '1990s': '1990s',
-  '2000s': '2000s', '2010s': '2010s', '2020s': '2020s',
-}
-
-const TAG_CATEGORIES = [
-  { id: 'class', tags: ['formula', 'gt3', 'gt2', 'gt4', 'cup', 'prototype', 'rally'] },
-  { id: 'tier', tags: ['hypercar', 'supercar', 'sports_car', 'hot_hatch', 'lightweight'] },
-  { id: 'era', tags: ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'] },
-]
-
-function getTagCategory(tag) {
-  for (const cat of TAG_CATEGORIES) {
+function getTagCategory(tag, categories) {
+  for (const cat of categories) {
     if (cat.tags.includes(tag)) return cat.id
   }
   return 'other'
@@ -26,12 +16,16 @@ function getTagCategory(tag) {
 /**
  * Check if car tags pass the active filter.
  * OR within a category, AND across categories.
+ *
+ * @param {string[]} carTags
+ * @param {Set<string>} activeTags
+ * @param {Array<{ id: string, tags: string[] }>} categories - From useCarMetadata
  */
-export function matchesTagFilter(carTags, activeTags) {
+export function matchesTagFilter(carTags, activeTags, categories = []) {
   if (activeTags.size === 0) return true
   const byCategory = {}
   for (const tag of activeTags) {
-    const cat = getTagCategory(tag)
+    const cat = getTagCategory(tag, categories)
     if (!byCategory[cat]) byCategory[cat] = []
     byCategory[cat].push(tag)
   }
@@ -162,10 +156,21 @@ export function RankBadge({ rank, podium = false }) {
   return <span className={cls}>{rank}</span>
 }
 
-export function TagFilterBar({ availableTags, activeTags, onToggle, onClear }) {
+/**
+ * Tag filter pill bar. Categories and labels come from the CDN via
+ * useCarMetadata — pass `carMetadata.categories` and `carMetadata.tagLabels`.
+ *
+ * @param {string[]} props.availableTags - Tags actually present on the data
+ * @param {Set<string>} props.activeTags
+ * @param {(tag: string) => void} props.onToggle
+ * @param {() => void} props.onClear
+ * @param {Array<{ id: string, label?: string, tags: string[] }>} props.categories
+ * @param {Record<string, string>} props.tagLabels
+ */
+export function TagFilterBar({ availableTags, activeTags, onToggle, onClear, categories = [], tagLabels = {} }) {
   if (!availableTags || availableTags.length < 2) return null
 
-  const groups = TAG_CATEGORIES
+  const groups = categories
     .map((cat) => ({ id: cat.id, tags: cat.tags.filter((t) => availableTags.includes(t)) }))
     .filter((g) => g.tags.length > 0)
 
@@ -186,7 +191,7 @@ export function TagFilterBar({ availableTags, activeTags, onToggle, onClear }) {
               onClick={() => onToggle(tag)}
               className={`pvx-tag ${activeTags.has(tag) ? 'pvx-tag--active' : ''}`}
             >
-              {TAG_LABELS[tag] || tag}
+              {tagLabels[tag] || tag}
             </button>
           ))}
         </span>
