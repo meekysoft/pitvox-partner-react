@@ -1,5 +1,7 @@
 # Changelog
 
+## [0.7.17](https://github.com/meekysoft/pitvox-partner-react/compare/v0.7.16...v0.7.17) (2026-04-30)
+
 ## [0.7.16](https://github.com/meekysoft/pitvox-partner-react/compare/v0.7.15...v0.7.16) (2026-04-30)
 
 ## [0.7.15](https://github.com/meekysoft/pitvox-partner-react/compare/v0.7.14...v0.7.15) (2026-04-30)
