@@ -212,6 +212,7 @@ function DashboardPage() {
 | `steamId` | `string` | — | Driver's Steam ID (required) |
 | `avatarUrl` | `string` | — | Avatar URL from your auth provider |
 | `memberSince` | `string` | — | ISO date for "Racing since" display |
+| `hideProfile` | `boolean` | `false` | Skip the avatar/name profile card. Useful when the host site already shows the user's identity in a navbar — saves redundant page real estate. |
 | `onComboSelect` | `(combo) => void` | — | Called when a Recent Combos row is clicked. Wire to your router to take the driver to the partner-scoped leaderboard for that combo (see example above). When omitted, rows render as static. |
 | `onGameRatingSelect` | `(entry) => void` | — | Called when a Driver Rating chip is clicked, with `{game, label, rating, rank, totalDrivers}`. Wire to your rankings page if you have one. |
 | `className` | `string` | — | Additional class on root container |

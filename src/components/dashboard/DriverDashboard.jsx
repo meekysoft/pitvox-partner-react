@@ -24,6 +24,9 @@ import { NotificationsCard } from './NotificationsCard.jsx'
  * @param {string} props.steamId - Driver's Steam ID
  * @param {string} [props.avatarUrl] - Avatar URL (from auth provider)
  * @param {string} [props.memberSince] - ISO date for "Racing since"
+ * @param {boolean} [props.hideProfile=false] - Skip the avatar/name profile
+ *   card. Useful when the host site already shows the user's identity
+ *   prominently (e.g. in a navbar) and an extra header is redundant.
  * @param {(combo: object) => void} [props.onComboSelect] - Combo row click handler
  * @param {(entry: object) => void} [props.onGameRatingSelect] - Rating chip click handler
  * @param {string} [props.className]
@@ -32,6 +35,7 @@ export function DriverDashboard({
   steamId,
   avatarUrl,
   memberSince,
+  hideProfile = false,
   onComboSelect,
   onGameRatingSelect,
   className = '',
@@ -59,11 +63,13 @@ export function DriverDashboard({
 
   return (
     <div className={`pvx-dash ${className}`}>
-      <DriverProfile
-        driverName={stats.driverName}
-        avatarUrl={avatarUrl}
-        memberSince={memberSince}
-      />
+      {!hideProfile && (
+        <DriverProfile
+          driverName={stats.driverName}
+          avatarUrl={avatarUrl}
+          memberSince={memberSince}
+        />
+      )}
       <StatsCards
         stats={stats}
         gameRatings={gameRatings}
