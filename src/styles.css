@@ -142,11 +142,14 @@
   border: 1px solid var(--pvx-border);
   background: var(--pvx-bg-card);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .pvx-card-header {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--pvx-border-header);
+  flex-shrink: 0;
 }
 
 .pvx-card-header--split {
@@ -157,6 +160,7 @@
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--pvx-border-header);
+  flex-shrink: 0;
 }
 
 .pvx-card-header-left {
@@ -2161,7 +2165,9 @@
 .pvx-dash-records-list {
   display: flex;
   flex-direction: column;
-  max-height: 24rem;
+  flex: 1;
+  min-height: 0;
+  max-height: 30rem;
   overflow-y: auto;
 }
 
@@ -2319,6 +2325,8 @@
 .pvx-dash-combos-list {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   max-height: 30rem;
   overflow-y: auto;
 }
@@ -2609,7 +2617,9 @@
 .pvx-notif-list {
   display: flex;
   flex-direction: column;
-  max-height: 24rem;
+  flex: 1;
+  min-height: 0;
+  max-height: 30rem;
   overflow-y: auto;
 }
 
