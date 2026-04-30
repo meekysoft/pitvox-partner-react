@@ -2238,6 +2238,206 @@
   color: #fbbf24;
 }
 
+.pvx-dash-game-badge--lmu {
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+}
+
+/* ─── Rating chips (per-game) ───────────────────────────────────── */
+
+.pvx-dash-stat-card--rating-chips .pvx-dash-stat-icon {
+  color: var(--pvx-rank-bronze);
+}
+
+.pvx-dash-rating-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.pvx-dash-rating-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  background: rgba(31, 41, 55, 0.6);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.pvx-dash-rating-chip--clickable {
+  cursor: pointer;
+  transition: background 150ms;
+}
+
+.pvx-dash-rating-chip--clickable:hover {
+  background: rgba(55, 65, 81, 0.8);
+}
+
+.pvx-dash-rating-chip-label {
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pvx-text-muted);
+  font-family: var(--pvx-font-mono);
+}
+
+.pvx-dash-rating-chip-value {
+  font-weight: 700;
+  color: var(--pvx-text-primary);
+}
+
+.pvx-dash-rating-chip-rank {
+  font-size: 0.625rem;
+  color: var(--pvx-text-dimmed);
+}
+
+/* ─── Recent Combos list ───────────────────────────────────────── */
+
+.pvx-dash-combos-icon {
+  display: inline-flex;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.pvx-dash-combos-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--pvx-accent);
+}
+
+.pvx-dash-combos-count {
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: var(--pvx-text-muted);
+  margin-left: 0.375rem;
+}
+
+.pvx-dash-combos-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 30rem;
+  overflow-y: auto;
+}
+
+.pvx-dash-combo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.625rem 1rem;
+}
+
+.pvx-dash-combo-row + .pvx-dash-combo-row {
+  border-top: 1px solid rgba(31, 41, 55, 0.5);
+}
+
+.pvx-dash-combo-row--clickable {
+  cursor: pointer;
+  transition: background 120ms;
+}
+
+.pvx-dash-combo-row--clickable:hover {
+  background: rgba(31, 41, 55, 0.4);
+}
+
+.pvx-dash-combo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.pvx-dash-combo-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.pvx-dash-combo-track {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--pvx-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pvx-dash-combo-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--pvx-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pvx-dash-combo-car {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pvx-dash-combo-meta-sep {
+  opacity: 0.5;
+}
+
+.pvx-dash-combo-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-shrink: 0;
+}
+
+.pvx-dash-combo-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--pvx-text-primary);
+}
+
+.pvx-dash-combo-rank-text {
+  font-size: 0.875rem;
+}
+
+.pvx-dash-combo-rank-text--muted {
+  color: var(--pvx-text-muted);
+  font-weight: 400;
+}
+
+.pvx-dash-combo-rank-total {
+  color: var(--pvx-text-muted);
+  font-weight: 400;
+}
+
+.pvx-dash-combo-trophy svg {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--pvx-rank-gold);
+  display: block;
+}
+
+.pvx-dash-combo-gap {
+  font-family: var(--pvx-font-mono);
+  font-size: 0.75rem;
+  color: var(--pvx-text-muted);
+}
+
+.pvx-dash-combo-pb {
+  font-family: var(--pvx-font-mono);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--pvx-accent);
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    Upcoming Events
    ═══════════════════════════════════════════════════════════════════ */

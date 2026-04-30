@@ -182,14 +182,26 @@ The `DriverDashboard` is a self-contained component with no routing dependency:
 
 ```jsx
 import { DriverDashboard } from '@pitvox/partner-react'
+import { useNavigate } from 'react-router-dom'
 import '@pitvox/partner-react/styles.css'
 
 function DashboardPage() {
+  const navigate = useNavigate()
+
+  const handleComboSelect = (combo) => {
+    const params = new URLSearchParams()
+    params.set('track', `${combo.trackId}|${combo.trackLayout || ''}`)
+    params.set('car', combo.carId)
+    params.set('highlight', user.steamId)
+    navigate(`/leaderboards?${params.toString()}`)
+  }
+
   return (
     <DriverDashboard
       steamId={user.steamId}
       avatarUrl={user.avatarUrl}
       memberSince={user.createdAt}
+      onComboSelect={handleComboSelect}
     />
   )
 }
@@ -200,35 +212,61 @@ function DashboardPage() {
 | `steamId` | `string` | — | Driver's Steam ID (required) |
 | `avatarUrl` | `string` | — | Avatar URL from your auth provider |
 | `memberSince` | `string` | — | ISO date for "Racing since" display |
+| `onComboSelect` | `(combo) => void` | — | Called when a Recent Combos row is clicked. Wire to your router to take the driver to the partner-scoped leaderboard for that combo (see example above). When omitted, rows render as static. |
+| `onGameRatingSelect` | `(entry) => void` | — | Called when a Driver Rating chip is clicked, with `{game, label, rating, rank, totalDrivers}`. Wire to your rankings page if you have one. |
 | `className` | `string` | — | Additional class on root container |
 
 The dashboard automatically includes:
+- **Stats Cards** — Total Laps, Cars Used (each with a click-to-toggle breakdown popover), and per-game Driver Rating chips (one chip per game where the driver has a rating, with rank info)
 - **Upcoming Events** — competition rounds the driver is registered for (CDN-based, always available)
+- **Recent Combos** — every (track, layout, car, game, version) the driver has touched in the partner scope, sorted by lastDrivenAt desc, with rank/gap and a leader-trophy icon for combos where the driver holds the record. Replaces the older Records table — held records surface as trophies on the relevant combo rows.
 - **Notifications** — only when `onFetchNotifications` is provided to the provider (see [Notifications](#notifications))
 
 ### Layer components
 
 ```jsx
-import { DriverProfile, StatsCards, RecordsTable, UpcomingEvents, NotificationsCard } from '@pitvox/partner-react'
+import {
+  DriverProfile,
+  StatsCards,
+  RecentCombosCard,
+  RecordsTable,
+  UpcomingEvents,
+  NotificationsCard,
+} from '@pitvox/partner-react'
 ```
 
+- **`<StatsCards>`** — Stats row. Pass `gameRatings` (from `useDriverRatingsByGame`) for the new chips behaviour, or `rating` (from `useDriverRating`) for the legacy single-number layout. Optional `onGameRatingSelect`.
+- **`<RecentCombosCard>`** — Recent combos list with rank/gap and trophy treatment. Accepts `combos` (from `useDriverCombos`) and optional `onComboSelect(combo)` for row navigation.
+- **`<RecordsTable>`** — Legacy "Current Records" list, still exported for consumers that prefer the explicit records UI. The composite `DriverDashboard` no longer renders it (records are surfaced as trophies on `RecentCombosCard` rows instead).
 - **`<UpcomingEvents>`** — Upcoming competition rounds card (accepts `events` array from `useUpcomingEvents()`)
 - **`<NotificationsCard>`** — Notifications list with read/unread state (accepts `notifications`, `unreadCount`, `onMarkRead`, `onMarkAllRead`)
 
 ### Hooks
 
 ```jsx
-import { useDriverStats, useDriverRating, useDriverRatings, useUpcomingEvents } from '@pitvox/partner-react'
+import {
+  useDriverStats,
+  useDriverCombos,
+  useDriverRating,
+  useDriverRatings,
+  useDriverRatingsByGame,
+  useUpcomingEvents,
+} from '@pitvox/partner-react'
 ```
 
-**`useDriverStats(steamId)`** — Driver stats, records, and ranking from CDN.
+**`useDriverStats(steamId)`** — Driver stats, records, and ranking from CDN. Always fetches the *global* index (not partner-scoped) so stats reflect the driver's whole career, not just partner-affiliated activity.
 
-**`useDriverRating(steamId)`** — Single driver's rating from the partner ratings file.
+**`useDriverCombos(steamId)`** — Per-(track, layout, car, game, version) combo list, partner-scoped via the provider's `partnerSlug`. Each entry: `{trackId, trackLayout, carId, game, gameVersion, lapCount, validLapCount, lastDrivenAt, personalBestMs, rank, totalDrivers, gapToLeaderMs, gapToNextMs}`. Sorted server-side by `lastDrivenAt` desc. Rank/gap fields refresh on the 5-min full pass on the partner CDN path; `lapCount` and `lastDrivenAt` are always fresh.
+
+**`useDriverRating(steamId)`** — Single driver's rating from the partner ratings file (legacy, single game).
 
 **`useDriverRatings(options?)`** — All driver ratings for the rankings table.
-- `options.gameVersion` — EVO version filter (null/undefined for ACC)
+- `options.game` — Game identifier (`'evo'`, `'acc'`, `'lmu'`)
+- `options.gameVersion` — Version filter for versioned games
 - `options.enabled` — Whether to enable the query (default `true`)
 - Returns `{ data: { drivers: [...], driverCount }, isLoading, error }`
+
+**`useDriverRatingsByGame(steamId)`** — Per-game rating chips for one driver. Reads default versions from the leaderboard index's `versions` metadata (no hardcode), queries each game's ratings file in parallel, and returns `[{game, label, rating, rank, totalDrivers}]` for games where the driver appears. Order matches the leaderboards page tabs (EVO, ACC, LMU). Drives the chip layout in `<StatsCards>`.
 
 **`useUpcomingEvents()`** — Upcoming competition rounds the current user is registered for (CDN-based). When `onFetchServerPassword` is provided to the provider, each event includes `serverAddress` and `serverPassword` fields.
 

@@ -75,15 +75,30 @@ function StatCardWithBreakdown({ icon, value, label, items, labelKey, countKey }
 }
 
 /**
- * Stats cards row — Total Laps, Cars Used, Driver Rating.
- * Laps and Cars cards show a breakdown tooltip on hover.
+ * Stats cards row — Total Laps, Cars Used, Driver Rating(s).
+ *
+ * The Laps and Cars cards open a breakdown popover on click. The Driver
+ * Rating card supports two modes:
+ *
+ * - **`gameRatings`** (preferred) — array of `{game, label, rating, rank,
+ *   totalDrivers}`. Renders one chip per game. Suits multi-sim drivers and
+ *   single-sim drivers equally well — chip count is whatever the user has.
+ *   Pass an `onGameRatingSelect(entry)` callback to make chips clickable.
+ *
+ * - **`rating`** (legacy) — single object. Renders a single big number,
+ *   matching the original API. Kept for backward compatibility with
+ *   consumers that haven't migrated.
+ *
+ * If both are provided, `gameRatings` wins.
  *
  * @param {object} props
  * @param {object} props.stats - From useDriverStats().data
- * @param {object} [props.rating] - From useDriverRating().data
+ * @param {Array}  [props.gameRatings] - From useDriverRatingsByGame().data
+ * @param {(entry: object) => void} [props.onGameRatingSelect] - Chip click handler
+ * @param {object} [props.rating] - Legacy single rating from useDriverRating().data
  * @param {string} [props.className]
  */
-export function StatsCards({ stats, rating, className = '' }) {
+export function StatsCards({ stats, gameRatings, onGameRatingSelect, rating, className = '' }) {
   if (!stats) return null
 
   const trackItems = stats.trackBreakdown.map((t) => ({
@@ -95,6 +110,8 @@ export function StatsCards({ stats, rating, className = '' }) {
     name: formatCarName(c.carId),
     lapCount: c.lapCount,
   }))
+
+  const hasChips = Array.isArray(gameRatings) && gameRatings.length > 0
 
   return (
     <div className={`pvx-dash-stats ${className}`}>
@@ -116,7 +133,41 @@ export function StatsCards({ stats, rating, className = '' }) {
         countKey="lapCount"
       />
 
-      {rating && (
+      {hasChips ? (
+        <div className="pvx-dash-stat-card pvx-dash-stat-card--rating-chips">
+          <RatingIcon />
+          <div className="pvx-dash-stat-content">
+            <span className="pvx-dash-stat-label">Driver Rating</span>
+            <div className="pvx-dash-rating-chips">
+              {gameRatings.map((r) => {
+                const clickable = !!onGameRatingSelect
+                const handleKeyDown = (e) => {
+                  if (!clickable) return
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onGameRatingSelect(r)
+                  }
+                }
+                return (
+                  <span
+                    key={r.game}
+                    className={`pvx-dash-rating-chip${clickable ? ' pvx-dash-rating-chip--clickable' : ''}`}
+                    onClick={clickable ? () => onGameRatingSelect(r) : undefined}
+                    onKeyDown={clickable ? handleKeyDown : undefined}
+                    role={clickable ? 'button' : undefined}
+                    tabIndex={clickable ? 0 : undefined}
+                    title={`${r.label} rating: ${r.rating.toFixed(1)} (#${r.rank} of ${r.totalDrivers})`}
+                  >
+                    <span className="pvx-dash-rating-chip-label">{r.label}</span>
+                    <span className="pvx-dash-rating-chip-value">{r.rating.toFixed(1)}</span>
+                    <span className="pvx-dash-rating-chip-rank">#{r.rank}/{r.totalDrivers}</span>
+                  </span>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      ) : rating ? (
         <div className="pvx-dash-stat-card pvx-dash-stat-card--rating">
           <RatingIcon />
           <div className="pvx-dash-stat-content">
@@ -125,7 +176,7 @@ export function StatsCards({ stats, rating, className = '' }) {
             <span className="pvx-dash-stat-sub">#{rating.rank} of {rating.totalDrivers}</span>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }

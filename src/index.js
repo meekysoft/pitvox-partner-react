@@ -52,7 +52,8 @@ export { CompletedBadge } from './components/competitions/CompletedBadge.jsx'
 
 // Hooks — Dashboard
 export { useDriverStats } from './hooks/useDriverStats.js'
-export { useDriverRating, useDriverRatings } from './hooks/useDriverRating.js'
+export { useDriverCombos } from './hooks/useDriverCombos.js'
+export { useDriverRating, useDriverRatings, useDriverRatingsByGame } from './hooks/useDriverRating.js'
 export { useUpcomingEvents } from './hooks/useUpcomingEvents.js'
 
 // Hooks — Notifications
@@ -70,6 +71,7 @@ export { DriverDashboard } from './components/dashboard/DriverDashboard.jsx'
 // Components — Dashboard (individual layers)
 export { DriverProfile } from './components/dashboard/DriverProfile.jsx'
 export { StatsCards } from './components/dashboard/StatsCards.jsx'
+export { RecentCombosCard } from './components/dashboard/RecentCombosCard.jsx'
 export { RecordsTable } from './components/dashboard/RecordsTable.jsx'
 export { UpcomingEvents } from './components/dashboard/UpcomingEvents.jsx'
 export { NotificationsCard } from './components/dashboard/NotificationsCard.jsx'

@@ -1,34 +1,51 @@
 import { useDriverStats } from '../../hooks/useDriverStats.js'
-import { useDriverRating } from '../../hooks/useDriverRating.js'
+import { useDriverCombos } from '../../hooks/useDriverCombos.js'
+import { useDriverRatingsByGame } from '../../hooks/useDriverRating.js'
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents.js'
 import { useNotifications, useNotificationsEnabled, useMarkNotificationRead, useMarkAllNotificationsRead } from '../../hooks/useNotifications.js'
 import { DriverProfile } from './DriverProfile.jsx'
 import { StatsCards } from './StatsCards.jsx'
-import { RecordsTable } from './RecordsTable.jsx'
+import { RecentCombosCard } from './RecentCombosCard.jsx'
 import { UpcomingEvents } from './UpcomingEvents.jsx'
 import { NotificationsCard } from './NotificationsCard.jsx'
 
 /**
  * Composite driver dashboard component.
- * Fetches and displays a driver's profile, stats, rating, records,
+ *
+ * Fetches and displays the driver's profile, stats, per-game rating chips,
+ * recent combos (with rank/gap and quick-nav into the partner's leaderboard),
  * upcoming events, and notifications.
+ *
+ * The Records table has been replaced by the trophy iconography on the
+ * Recent Combos card — each combo where the driver is `rank=1` (and there's
+ * more than one driver on the leaderboard) flags as a held record.
  *
  * @param {object} props
  * @param {string} props.steamId - Driver's Steam ID
  * @param {string} [props.avatarUrl] - Avatar URL (from auth provider)
  * @param {string} [props.memberSince] - ISO date for "Racing since"
+ * @param {(combo: object) => void} [props.onComboSelect] - Combo row click handler
+ * @param {(entry: object) => void} [props.onGameRatingSelect] - Rating chip click handler
  * @param {string} [props.className]
  */
-export function DriverDashboard({ steamId, avatarUrl, memberSince, className = '' }) {
+export function DriverDashboard({
+  steamId,
+  avatarUrl,
+  memberSince,
+  onComboSelect,
+  onGameRatingSelect,
+  className = '',
+}) {
   const { data: stats, isLoading: statsLoading, error: statsError } = useDriverStats(steamId)
-  const { data: rating, isLoading: ratingLoading } = useDriverRating(steamId)
+  const { data: gameRatings } = useDriverRatingsByGame(steamId)
+  const { data: combos } = useDriverCombos(steamId)
   const { data: upcomingEvents, isLoading: eventsLoading } = useUpcomingEvents()
   const notificationsEnabled = useNotificationsEnabled()
   const { data: notifData, isLoading: notifLoading } = useNotifications({ limit: 10 })
   const markRead = useMarkNotificationRead()
   const markAllRead = useMarkAllNotificationsRead()
 
-  if (statsLoading || ratingLoading) {
+  if (statsLoading) {
     return <div className="pvx-loading">Loading dashboard...</div>
   }
 
@@ -47,14 +64,18 @@ export function DriverDashboard({ steamId, avatarUrl, memberSince, className = '
         avatarUrl={avatarUrl}
         memberSince={memberSince}
       />
-      <StatsCards stats={stats} rating={rating} />
+      <StatsCards
+        stats={stats}
+        gameRatings={gameRatings}
+        onGameRatingSelect={onGameRatingSelect}
+      />
 
       {steamId && (
         <UpcomingEvents events={upcomingEvents} isLoading={eventsLoading} />
       )}
 
       <div className={`pvx-dash-row ${notificationsEnabled ? 'pvx-dash-row--2col' : ''}`}>
-        <RecordsTable records={stats.currentRecords} />
+        <RecentCombosCard combos={combos} onComboSelect={onComboSelect} />
         {notificationsEnabled && (
           <NotificationsCard
             notifications={notifData?.notifications}
