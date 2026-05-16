@@ -160,6 +160,31 @@ export function useCompetitionRoundLaps(competitionId, roundNumber, options = {}
   })
 }
 
+/**
+ * Fetch the LMU race-position progression for a round from CDN.
+ * Only LMU race rounds have this; returns null gracefully otherwise
+ * (EVO rounds, non-race sessions, races that never went green).
+ *
+ * @param {string} competitionId
+ * @param {number} roundNumber
+ * @param {object} [options]
+ * @param {string} [options.partnerSlug] - Override partner slug
+ * @param {boolean} [options.enabled] - Gate the query (e.g. only for LMU)
+ */
+export function useCompetitionRoundPositions(competitionId, roundNumber, options = {}) {
+  const ctx = usePitVox()
+  const slug = options.partnerSlug || ctx.partnerSlug
+
+  return useQuery({
+    queryKey: ['pitvox', 'competition', slug, competitionId, 'round', roundNumber, 'positions'],
+    queryFn: () =>
+      fetchCdnJson(ctx.cdnUrl, `competitions/${slug}/${competitionId}/rounds/${roundNumber}/positions.json`)
+        .catch(() => null),
+    enabled: (options.enabled ?? true) && !!slug && !!competitionId && roundNumber != null,
+    staleTime: 60_000,
+  })
+}
+
 export function useCompetitionEntryList(competitionId, options = {}) {
   const ctx = usePitVox()
   const slug = options.partnerSlug || ctx.partnerSlug

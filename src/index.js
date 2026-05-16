@@ -21,6 +21,7 @@ export {
   useCompetitionAllRounds,
   useCompetitionEntryList,
   useCompetitionRoundLaps,
+  useCompetitionRoundPositions,
   useCompetitionLeaderboard,
 } from './hooks/useCompetitions.js'
 
@@ -44,6 +45,7 @@ export { RankingsTable } from './components/leaderboards/RankingsTable.jsx'
 export { CompetitionCards, CompetitionCard } from './components/competitions/CompetitionCards.jsx'
 export { StandingsTable } from './components/competitions/StandingsTable.jsx'
 export { RoundResults, RoundSessionResults } from './components/competitions/RoundResults.jsx'
+export { RacePositionsChart } from './components/competitions/RacePositionsChart.jsx'
 export { EntryList } from './components/competitions/EntryList.jsx'
 export { RegisterButton } from './components/competitions/RegisterButton.jsx'
 export { RegistrationPanel } from './components/competitions/RegistrationPanel.jsx'

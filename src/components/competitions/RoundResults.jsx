@@ -13,8 +13,13 @@
  */
 
 import { useState } from 'react'
-import { useCompetitionRound, useCompetitionRoundLaps } from '../../hooks/useCompetitions.js'
+import {
+  useCompetitionRound,
+  useCompetitionRoundLaps,
+  useCompetitionRoundPositions,
+} from '../../hooks/useCompetitions.js'
 import { formatCarName } from '../../utils/format.js'
+import { RacePositionsChart } from './RacePositionsChart.jsx'
 import {
   CompRankBadge,
   NationFlag,
@@ -103,6 +108,13 @@ export function RoundSessionResults({ round, competitionId, className }) {
     competitionId, round?.roundNumber, { enabled: !!competitionId }
   )
 
+  // Race-position progression (LMU only; returns null otherwise). Only fetch
+  // when the round actually has a Race session.
+  const hasRaceSession = sessions.some((s) => s.type === 'RACE')
+  const { data: positionsData } = useCompetitionRoundPositions(
+    competitionId, round?.roundNumber, { enabled: !!competitionId && hasRaceSession }
+  )
+
   const effectiveSession = activeSession
     || sessions.find((s) => s.type === 'RACE')?.type
     || sessions[0]?.type
@@ -111,6 +123,10 @@ export function RoundSessionResults({ round, competitionId, className }) {
 
   // Find lap data for the current session type
   const sessionLaps = lapData?.sessions?.find((s) => s.type === effectiveSession)?.drivers || null
+
+  const showPositions = currentSession?.type === 'RACE'
+    && positionsData?.timingPoints?.length > 0
+    && positionsData?.drivers?.length > 0
 
   return (
     <div className={className || ''}>
@@ -121,6 +137,13 @@ export function RoundSessionResults({ round, competitionId, className }) {
       />
 
       <SessionResultsTable session={currentSession} sessionLaps={sessionLaps} />
+
+      {showPositions && (
+        <div className="pvx-positions-section">
+          <div className="pvx-positions-section-title">Race Positions</div>
+          <RacePositionsChart positions={positionsData} />
+        </div>
+      )}
     </div>
   )
 }
@@ -137,6 +160,32 @@ function SessionResultsTable({ session, sessionLaps }) {
 
   const fastestSplits = calcFastestSplits(session.results)
   const colCount = isRace ? 7 : 4
+
+  // Multi-class (LMU): if results carry >1 distinct carClass, render a class
+  // header row before each class block and rank within the class. EVO results
+  // have no carClass → single ungrouped block, unchanged behaviour.
+  const classes = [...new Set(session.results.map((r) => r.carClass).filter(Boolean))]
+  const isMultiClass = classes.length > 1
+
+  const renderRow = (result, index, displayPosition) => {
+    const driverLaps = sessionLaps?.[result.driverId]?.laps
+    const isExpanded = expandedDriver === result.driverId && !!driverLaps
+    return (
+      <SessionResultRow
+        key={result.driverId || index}
+        result={result}
+        isRace={isRace}
+        fastestSplits={fastestSplits}
+        rowIndex={index}
+        displayPosition={displayPosition}
+        hasLapDetail={!!driverLaps}
+        isExpanded={isExpanded}
+        onToggle={() => setExpandedDriver(isExpanded ? null : result.driverId)}
+        driverLaps={isExpanded ? driverLaps : null}
+        colCount={colCount}
+      />
+    )
+  }
 
   return (
     <div className="pvx-table-scroll">
@@ -157,32 +206,30 @@ function SessionResultsTable({ session, sessionLaps }) {
           </tr>
         </thead>
         <tbody className="pvx-tbody">
-          {session.results.map((result, index) => {
-            const driverLaps = sessionLaps?.[result.driverId]?.laps
-            const isExpanded = expandedDriver === result.driverId && !!driverLaps
-            return (
-              <SessionResultRow
-                key={result.driverId || index}
-                result={result}
-                isRace={isRace}
-                fastestSplits={fastestSplits}
-                rowIndex={index}
-                hasLapDetail={!!driverLaps}
-                isExpanded={isExpanded}
-                onToggle={() => setExpandedDriver(isExpanded ? null : result.driverId)}
-                driverLaps={isExpanded ? driverLaps : null}
-                colCount={colCount}
-              />
-            )
-          })}
+          {isMultiClass
+            ? classes.sort().map((cls) => {
+                const rows = session.results
+                  .filter((r) => r.carClass === cls)
+                  .sort((a, b) => (a.classPosition ?? a.position) - (b.classPosition ?? b.position))
+                return [
+                  <tr key={`hdr-${cls}`} className="pvx-row pvx-row--class-header">
+                    <td colSpan={colCount} className="pvx-td pvx-td--class-header">{cls}</td>
+                  </tr>,
+                  ...rows.map((result, i) =>
+                    renderRow(result, i, result.classPosition ?? result.position)
+                  ),
+                ]
+              })
+            : session.results.map((result, index) => renderRow(result, index))}
         </tbody>
       </table>
     </div>
   )
 }
 
-function SessionResultRow({ result, isRace, fastestSplits, rowIndex, hasLapDetail, isExpanded, onToggle, driverLaps, colCount }) {
-  const isTopThree = result.position <= 3
+function SessionResultRow({ result, isRace, fastestSplits, rowIndex, displayPosition, hasLapDetail, isExpanded, onToggle, driverLaps, colCount }) {
+  const pos = displayPosition ?? result.position
+  const isTopThree = pos <= 3
 
   return (
     <>
@@ -192,7 +239,7 @@ function SessionResultRow({ result, isRace, fastestSplits, rowIndex, hasLapDetai
         style={hasLapDetail ? { cursor: 'pointer' } : undefined}
       >
         <td className="pvx-td">
-          <CompRankBadge position={result.position} />
+          <CompRankBadge position={pos} />
         </td>
         <td className="pvx-td pvx-td--primary">
           <NationFlag nation={result.nation} />
