@@ -2729,6 +2729,7 @@
 
 .pvx-positions-section {
   margin-top: 1.25rem;
+  padding: 1rem;
 }
 
 .pvx-positions-section-title {
@@ -2740,7 +2741,6 @@
 
 .pvx-positions-chart {
   margin-bottom: 1rem;
-  padding: 0.75rem 1rem 1rem;
 }
 
 .pvx-positions-title {
