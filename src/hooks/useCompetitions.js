@@ -146,6 +146,30 @@ export function useCompetitionLeaderboard(competitionId, options = {}) {
   })
 }
 
+/**
+ * Fetch a single round's hotlap leaderboard from CDN (aggregate best laps
+ * across that round's practice cycles). Multi-round hotlap competitions write
+ * one of these per round; returns null gracefully for rounds without data.
+ *
+ * @param {string} competitionId
+ * @param {number} roundNumber
+ * @param {object} [options]
+ * @param {string} [options.partnerSlug] - Override partner slug
+ */
+export function useCompetitionRoundLeaderboard(competitionId, roundNumber, options = {}) {
+  const ctx = usePitVox()
+  const slug = options.partnerSlug || ctx.partnerSlug
+
+  return useQuery({
+    queryKey: ['pitvox', 'competition', slug, competitionId, 'round', roundNumber, 'leaderboard'],
+    queryFn: () =>
+      fetchCdnJson(ctx.cdnUrl, `competitions/${slug}/${competitionId}/rounds/${roundNumber}/leaderboard.json`)
+        .catch(() => null),
+    enabled: !!slug && !!competitionId && roundNumber != null,
+    staleTime: 60_000,
+  })
+}
+
 export function useCompetitionRoundLaps(competitionId, roundNumber, options = {}) {
   const ctx = usePitVox()
   const slug = options.partnerSlug || ctx.partnerSlug

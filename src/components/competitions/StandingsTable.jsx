@@ -9,7 +9,7 @@
  */
 
 import { useCompetitionStandings, useCompetitionConfig } from '../../hooks/useCompetitions.js'
-import { CompRankBadge, NationFlag, CompLoadingState, CompEmptyState } from './shared.jsx'
+import { CompRankBadge, NationFlag, CompLoadingState, CompEmptyState, isRoundClosed } from './shared.jsx'
 
 export function StandingsTable({ competitionId, className }) {
   const { data: standings, isLoading: loadingStandings } = useCompetitionStandings(competitionId)
@@ -23,15 +23,22 @@ export function StandingsTable({ competitionId, className }) {
     return <CompEmptyState message="No standings data yet. Results will appear once rounds are finalised." />
   }
 
-  const finalizedRounds = config?.rounds?.filter((r) => r.isFinalized) || []
+  const isHotlap = config?.type === 'hotlap'
+  // Hotlap points come only from CLOSED rounds; championship from finalised
+  // rounds. These are the per-round columns shown alongside the totals.
+  const columnRounds = isHotlap
+    ? (config?.rounds?.filter(isRoundClosed) || [])
+    : (config?.rounds?.filter((r) => r.isFinalized) || [])
+  // Hotlap standings payload reports roundsClosed; championship roundsCompleted.
+  const roundsTallied = standings.roundsClosed ?? standings.roundsCompleted ?? 0
 
   return (
     <div className={`pvx-card ${className || ''}`}>
       <div className="pvx-card-header--split">
         <div className="pvx-card-header-left">
-          <h3 className="pvx-card-title">Championship Standings</h3>
+          <h3 className="pvx-card-title">{isHotlap ? 'Overall Standings' : 'Championship Standings'}</h3>
           <span className="pvx-standings-subtitle">
-            After {standings.roundsCompleted} round{standings.roundsCompleted !== 1 ? 's' : ''}
+            After {roundsTallied} round{roundsTallied !== 1 ? 's' : ''}{isHotlap ? ' closed' : ''}
             {standings.countingRounds > 0 && ` (best ${standings.countingRounds} count)`}
           </span>
         </div>
@@ -46,7 +53,7 @@ export function StandingsTable({ competitionId, className }) {
               <th className="pvx-th pvx-th--center pvx-hidden-below-sm">W</th>
               <th className="pvx-th pvx-th--center pvx-hidden-below-sm">Pod</th>
               <th className="pvx-th pvx-th--center">Points</th>
-              {finalizedRounds.map((r) => (
+              {columnRounds.map((r) => (
                 <th
                   key={r.roundNumber}
                   className="pvx-th pvx-th--center pvx-hidden-below-md"
@@ -62,7 +69,7 @@ export function StandingsTable({ competitionId, className }) {
               <StandingsRow
                 key={driver.driverId || driver.driverName}
                 driver={driver}
-                finalizedRounds={finalizedRounds}
+                columnRounds={columnRounds}
               />
             ))}
           </tbody>
@@ -72,7 +79,7 @@ export function StandingsTable({ competitionId, className }) {
   )
 }
 
-function StandingsRow({ driver, finalizedRounds }) {
+function StandingsRow({ driver, columnRounds }) {
   const isTopThree = driver.position <= 3
   const roundResultMap = new Map(
     driver.roundResults?.map((r) => [r.roundNumber, r]) || []
@@ -92,7 +99,7 @@ function StandingsRow({ driver, finalizedRounds }) {
       <td className="pvx-td pvx-td--center pvx-hidden-below-sm">{wins || '-'}</td>
       <td className="pvx-td pvx-td--center pvx-hidden-below-sm">{podiums || '-'}</td>
       <td className="pvx-td pvx-td--center pvx-standings-total">{driver.totalPoints}</td>
-      {finalizedRounds.map((r) => {
+      {columnRounds.map((r) => {
         const result = roundResultMap.get(r.roundNumber)
         const isDropped = result?.dropped
 

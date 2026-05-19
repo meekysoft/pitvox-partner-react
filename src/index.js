@@ -23,6 +23,7 @@ export {
   useCompetitionRoundLaps,
   useCompetitionRoundPositions,
   useCompetitionLeaderboard,
+  useCompetitionRoundLeaderboard,
 } from './hooks/useCompetitions.js'
 
 // Hooks — Registration
@@ -87,6 +88,7 @@ export {
   CompLoadingState,
   CompEmptyState,
   DEFAULT_COMPLETION_GRACE_DAYS,
+  isRoundClosed,
   isCompetitionComplete,
   getCompletionDate,
   getCompetitionStatus,

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useQueries, useQuery } from '@tanstack/react-query'
 import { usePitVox } from '../provider.jsx'
 import { fetchCdnJson } from '../lib/cdn.js'
+import { isRoundClosed } from '../components/competitions/shared.jsx'
 
 /**
  * Fetch upcoming competition rounds the current user is registered for.
@@ -60,9 +61,11 @@ export function useUpcomingEvents() {
       const isHotlap = comp.type === 'hotlap'
       const rounds = comp.rounds || []
       for (const round of rounds) {
-        // For hotlap, isFinalized is set incrementally for CDN updates,
-        // so only skip if the server has actually stopped
-        if (round.isFinalized && (!isHotlap || round.dediStatus === 'completed')) continue
+        // A round is "done" (not upcoming) once finalised — except hotlap,
+        // whose isFinalized is continuous while live; a hotlap round is done
+        // when its scheduled-end window has elapsed.
+        const roundDone = isHotlap ? isRoundClosed(round) : round.isFinalized
+        if (roundDone) continue
 
         const isLive = round.dediStatus === 'running' || round.dediStatus === 'provisioning'
         const isScheduled = round.dediStatus === 'scheduled'

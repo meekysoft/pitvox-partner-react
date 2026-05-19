@@ -19,6 +19,7 @@ import {
   CompLoadingState,
   CompEmptyState,
   getCompetitionStatus,
+  isRoundClosed,
 } from './shared.jsx'
 import { CompletedBadge } from './CompletedBadge.jsx'
 
@@ -55,7 +56,13 @@ export function CompetitionCard({ comp, onSelect, onRegister }) {
   const now = new Date()
   const nextRound = comp.rounds?.find((r) => r.startTime && new Date(r.startTime) >= now)
   const totalRounds = comp.rounds?.length || 0
-  const finalizedCount = comp.rounds?.filter((r) => r.isFinalized).length || 0
+  const isHotlap = comp.type === 'hotlap'
+  const isMultiRoundHotlap = isHotlap && totalRounds > 1
+  // Hotlap's isFinalized is continuous while live, so "completed" rounds are
+  // the ones whose scheduled-end window has elapsed.
+  const completedCount = isHotlap
+    ? (comp.rounds?.filter(isRoundClosed).length || 0)
+    : (comp.rounds?.filter((r) => r.isFinalized).length || 0)
   const status = getCompetitionStatus(comp)
   const isCompleted = status === 'recently-completed' || status === 'archived'
   const isChampionship = comp.type === 'championship'
@@ -109,11 +116,11 @@ export function CompetitionCard({ comp, onSelect, onRegister }) {
           {nextRound ? (
             <span className="pvx-comp-card-schedule-next">
               <span className="pvx-comp-card-schedule-label">Next:</span>{' '}
-              {comp.type !== 'hotlap' && `R${nextRound.roundNumber} `}{nextRound.track || 'TBD'} · {formatScheduleDate(nextRound.startTime)}
+              {(comp.type !== 'hotlap' || isMultiRoundHotlap) && `R${nextRound.roundNumber} `}{nextRound.track || 'TBD'} · {formatScheduleDate(nextRound.startTime)}
             </span>
           ) : totalRounds > 0 ? (
             <span className="pvx-comp-card-schedule-next">
-              {finalizedCount}/{totalRounds} rounds completed
+              {completedCount}/{totalRounds} rounds completed
             </span>
           ) : null}
           {totalRounds > 0 && (
@@ -121,8 +128,9 @@ export function CompetitionCard({ comp, onSelect, onRegister }) {
           )}
         </div>
 
-        {/* Completed podium (championships only — event/series don't have standings) */}
-        {isCompleted && isChampionship && (
+        {/* Completed podium — championship + multi-round hotlap have an
+            overall standings.json; single-round hotlap / event / series don't. */}
+        {isCompleted && (isChampionship || isMultiRoundHotlap) && (
           <CompletedBadge competitionId={comp.id} />
         )}
 

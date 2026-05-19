@@ -152,17 +152,34 @@ export function CompEmptyState({ message = 'No data available.' }) {
 export const DEFAULT_COMPLETION_GRACE_DAYS = 3
 
 /**
+ * Returns true if a round has "closed" — its scheduled-end window has elapsed.
+ * Prefers a live client-side comparison against `closesAt` (responsive, and
+ * independent of when the sync Lambda last ran), falling back to the
+ * server-computed `isClosed` snapshot. EC2-independent by design, so it works
+ * identically for PitVox-hosted and self-hosted rounds. `closesAt`/`isClosed`
+ * are emitted per round in the CDN config + index by sync-competitions.
+ */
+export function isRoundClosed(round) {
+  if (!round) return false
+  if (round.closesAt) {
+    const t = new Date(round.closesAt).getTime()
+    if (!Number.isNaN(t)) return Date.now() >= t
+  }
+  return !!round.isClosed
+}
+
+/**
  * Returns true if the competition has rounds and every round is finalised.
- * Admin-controlled and therefore the source of truth for "this competition
- * is done".
+ * Source of truth for "this competition is done".
  */
 export function isCompetitionComplete(comp) {
   const rounds = comp?.rounds
   if (!rounds?.length) return false
-  // For hotlap: isFinalized is set incrementally for CDN updates, so it doesn't
-  // mean the competition is over. Check that the server has actually stopped.
+  // For hotlap: isFinalized is set incrementally for live CDN updates, so it
+  // never means "over". A hotlap round is done when its scheduled-end window
+  // has elapsed (works for self-hosted too — no dediStatus dependency).
   if (comp.type === 'hotlap') {
-    return rounds.every((r) => r.isFinalized && r.dediStatus === 'completed')
+    return rounds.every((r) => isRoundClosed(r))
   }
   return rounds.every((r) => r.isFinalized)
 }
