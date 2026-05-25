@@ -135,7 +135,7 @@ All competition detail hooks accept `options.partnerSlug` to override the provid
 import {
   CompetitionCards, CompetitionCard, CompetitionResultsTabs,
   StandingsTable, RoundResults, RoundSessionResults,
-  EntryList, RegisterButton, RegistrationPanel,
+  EntryList, RegisterButton, RegistrationPanel, WeatherIcon,
 } from '@pitvox/partner-react'
 import '@pitvox/partner-react/styles.css'
 ```
@@ -150,6 +150,7 @@ import '@pitvox/partner-react/styles.css'
 - **`<EntryList>`** — Registered drivers grid with avatars
 - **`<RegisterButton>`** — Register/withdraw toggle (render prop or default button)
 - **`<RegistrationPanel>`** — Registration form + entry list with unregister
+- **`<WeatherIcon>`** — Lucide-style weather glyph (8 conditions: clear, scattered/broken clouds, overcast, drizzle, damp, rain, heavy rain) with a refresh corner badge when `weatherBehaviour` is dynamic. Sized in `em` so it scales with surrounding text. Renders nothing when `weatherType` is null/unknown, so it degrades cleanly while older CDN snapshots roll through. Props: `weatherType`, `weatherBehaviour`, `className`.
 
 ### Shared utilities
 
