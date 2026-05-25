@@ -51,6 +51,7 @@ export { EntryList } from './components/competitions/EntryList.jsx'
 export { RegisterButton } from './components/competitions/RegisterButton.jsx'
 export { RegistrationPanel } from './components/competitions/RegistrationPanel.jsx'
 export { CompetitionResultsTabs } from './components/competitions/CompetitionResultsTabs.jsx'
+export { WeatherIcon } from './components/competitions/WeatherIcon.jsx'
 export { CompletedBadge } from './components/competitions/CompletedBadge.jsx'
 
 // Hooks — Dashboard

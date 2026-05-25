@@ -22,6 +22,7 @@ import {
   isRoundClosed,
 } from './shared.jsx'
 import { CompletedBadge } from './CompletedBadge.jsx'
+import { WeatherIcon } from './WeatherIcon.jsx'
 
 export function CompetitionCards({ competitions, isLoading, onSelect, onRegister, className }) {
   if (isLoading) {
@@ -52,9 +53,17 @@ export function CompetitionCard({ comp, onSelect, onRegister }) {
   const deadlinePassed = reg?.deadline && new Date(reg.deadline) < new Date()
   const regOpen = reg?.isOpen && !deadlinePassed && !isFull
 
-  // Find next upcoming round
+  // Prefer a currently-active round (started, not yet closed) over the next
+  // upcoming one — otherwise a live multi-round hotlap shows R2 as "Next"
+  // while drivers are racing in R1. Falls back to next upcoming if nothing
+  // is live right now.
   const now = new Date()
-  const nextRound = comp.rounds?.find((r) => r.startTime && new Date(r.startTime) >= now)
+  const activeRound = comp.rounds?.find(
+    (r) => r.startTime && new Date(r.startTime) <= now && !isRoundClosed(r),
+  )
+  const nextRound = activeRound
+    || comp.rounds?.find((r) => r.startTime && new Date(r.startTime) >= now)
+  const isActiveRound = !!activeRound
   const totalRounds = comp.rounds?.length || 0
   const isHotlap = comp.type === 'hotlap'
   const isMultiRoundHotlap = isHotlap && totalRounds > 1
@@ -115,8 +124,17 @@ export function CompetitionCard({ comp, onSelect, onRegister }) {
         <div className="pvx-comp-card-schedule">
           {nextRound ? (
             <span className="pvx-comp-card-schedule-next">
-              <span className="pvx-comp-card-schedule-label">Next:</span>{' '}
+              <span className="pvx-comp-card-schedule-label">{isActiveRound ? 'Live:' : 'Next:'}</span>{' '}
               {(comp.type !== 'hotlap' || isMultiRoundHotlap) && `R${nextRound.roundNumber} `}{nextRound.track || 'TBD'} · {formatScheduleDate(nextRound.startTime)}
+              {(nextRound.weatherType || comp.weatherType) && (
+                <>
+                  {' '}
+                  <WeatherIcon
+                    weatherType={nextRound.weatherType || comp.weatherType}
+                    weatherBehaviour={nextRound.weatherBehaviour || comp.weatherBehaviour}
+                  />
+                </>
+              )}
             </span>
           ) : totalRounds > 0 ? (
             <span className="pvx-comp-card-schedule-next">

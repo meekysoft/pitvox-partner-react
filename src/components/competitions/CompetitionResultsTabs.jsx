@@ -17,7 +17,7 @@ import { useCompetitionConfig, useCompetitionAllRounds, useCompetitionLeaderboar
 import { formatCarName } from '../../utils/format.js'
 import { StandingsTable } from './StandingsTable.jsx'
 import { RoundSessionResults } from './RoundResults.jsx'
-import { PODIUM_MEDALS, CompLoadingState, CompEmptyState, CompRankBadge, NationFlag, formatSessionLabel } from './shared.jsx'
+import { PODIUM_MEDALS, CompLoadingState, CompEmptyState, CompRankBadge, NationFlag, formatSessionLabel, isRoundClosed } from './shared.jsx'
 
 export function CompetitionResultsTabs({ competitionId, className }) {
   const { data: config, isLoading: configLoading } = useCompetitionConfig(competitionId)
@@ -50,9 +50,17 @@ export function CompetitionResultsTabs({ competitionId, className }) {
   const hotlapRound = isSingleRoundHotlap && rounds.length > 0 ? rounds[0] : null
   const hotlapSessions = hotlapRound?.sessions || []
 
-  // Default tab
+  // Default tab. For multi-round hotlap with a currently-live round, prefer
+  // that round's tab over Standings — Standings is empty until the first
+  // round closes, and rounds run for days/weeks so users landing here while
+  // a round is live would otherwise see a dead-looking page.
+  const liveHotlapRound = isMultiRoundHotlap
+    ? configuredRounds.find(
+        (r) => r.startTime && new Date(r.startTime) <= new Date() && !isRoundClosed(r),
+      )
+    : null
   const defaultTab = isMultiRoundHotlap
-    ? 'standings'
+    ? (liveHotlapRound ? `hlround-${liveHotlapRound.roundNumber}` : 'standings')
     : isSingleRoundHotlap
       ? 'leaderboard'
       : isChampionship
