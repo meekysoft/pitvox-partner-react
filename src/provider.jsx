@@ -23,6 +23,8 @@ let internalQueryClient = null
  * @param {(notificationId: string) => Promise<void>} [props.onMarkNotificationRead] - Callback to mark a notification as read
  * @param {() => Promise<void>} [props.onMarkAllNotificationsRead] - Callback to mark all notifications as read
  * @param {(competitionId: string, roundNumber?: number) => Promise<{serverAddress?: string, serverPassword?: string}>} [props.onFetchServerPassword] - Callback to fetch server password for a registered competition
+ * @param {(promotionId: string, driverData: object) => Promise<void>} [props.onEnterPromotion] - Callback for in-app promotion entry (power mode)
+ * @param {(promotionId: string, steamId: string) => Promise<void>} [props.onWithdrawPromotionEntry] - Callback for in-app promotion entry withdrawal (power mode)
  * @param {import('react').ReactNode} props.children
  */
 export function PitVoxPartnerProvider({
@@ -36,6 +38,8 @@ export function PitVoxPartnerProvider({
   onMarkNotificationRead,
   onMarkAllNotificationsRead,
   onFetchServerPassword,
+  onEnterPromotion,
+  onWithdrawPromotionEntry,
   children,
 }) {
   const value = useMemo(() => ({
@@ -49,7 +53,9 @@ export function PitVoxPartnerProvider({
     onMarkNotificationRead: onMarkNotificationRead || null,
     onMarkAllNotificationsRead: onMarkAllNotificationsRead || null,
     onFetchServerPassword: onFetchServerPassword || null,
-  }), [partnerSlug, cdnUrl, pitvoxUrl, getSteamId, onRegister, onWithdraw, onFetchNotifications, onMarkNotificationRead, onMarkAllNotificationsRead, onFetchServerPassword])
+    onEnterPromotion: onEnterPromotion || null,
+    onWithdrawPromotionEntry: onWithdrawPromotionEntry || null,
+  }), [partnerSlug, cdnUrl, pitvoxUrl, getSteamId, onRegister, onWithdraw, onFetchNotifications, onMarkNotificationRead, onMarkAllNotificationsRead, onFetchServerPassword, onEnterPromotion, onWithdrawPromotionEntry])
 
   // Check if a QueryClient already exists (consumer provided their own)
   let hasExistingClient = false

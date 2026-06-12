@@ -35,6 +35,32 @@ export {
   useRegistrationUrl,
 } from './hooks/useRegistration.js'
 
+// Hooks — Promotions
+export {
+  usePromotions,
+  usePromotionConfig,
+  usePromotionEntryList,
+  usePromotionEntryStatus,
+  useEnterPromotion,
+  useWithdrawPromotionEntry,
+  usePromotionMode,
+  usePromotionUrl,
+  getPromotionStatus,
+  PROMOTION_STATUS_LABELS,
+} from './hooks/usePromotions.js'
+
+// Components — Promotions
+export { PromotionExplorer } from './components/promotions/PromotionExplorer.jsx'
+export { PromotionCards, PromotionCard } from './components/promotions/PromotionCards.jsx'
+export { PromotionDetail } from './components/promotions/PromotionDetail.jsx'
+export { EnterButton } from './components/promotions/EnterButton.jsx'
+export {
+  PromotionStatusBadge,
+  PromotionTypeBadge,
+  promotionWindowSummary,
+  formatPromotionDate,
+} from './components/promotions/shared.jsx'
+
 // Components — Leaderboards
 export { TracksTable } from './components/leaderboards/TracksTable.jsx'
 export { CarsTable } from './components/leaderboards/CarsTable.jsx'

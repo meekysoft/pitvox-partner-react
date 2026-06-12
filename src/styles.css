@@ -2854,3 +2854,466 @@
   width: 100%;
   height: 100%;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Promotions (giveaways)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.pvx-promo-explorer-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--pvx-text-primary);
+  margin: 0 0 1.5rem;
+}
+
+/* ─── Card grid ─── */
+
+.pvx-promo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .pvx-promo-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .pvx-promo-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Count-adaptive layouts (set by PromotionCards): a lone card renders wide
+   and centred; a pair caps at two columns. */
+.pvx-promo-grid--single {
+  grid-template-columns: 1fr;
+  max-width: 42rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .pvx-promo-grid--single { grid-template-columns: 1fr; }
+  .pvx-promo-grid--pair { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .pvx-promo-grid--single { grid-template-columns: 1fr; }
+  .pvx-promo-grid--pair { grid-template-columns: repeat(2, 1fr); }
+}
+
+.pvx-promo-card {
+  border-radius: var(--pvx-radius);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-bg-card);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 200ms, box-shadow 200ms;
+  display: flex;
+  flex-direction: column;
+}
+
+.pvx-promo-card:hover {
+  border-color: var(--pvx-accent);
+  box-shadow: 0 0 0 1px var(--pvx-accent);
+}
+
+.pvx-promo-card:focus-visible {
+  outline: 2px solid var(--pvx-accent);
+  outline-offset: 2px;
+}
+
+.pvx-promo-card-poster {
+  aspect-ratio: 16 / 9;
+  background: #0d1117;
+  overflow: hidden;
+}
+
+.pvx-promo-card-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pvx-promo-card-poster-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pvx-promo-gift-icon {
+  width: 3rem;
+  height: 3rem;
+  color: var(--pvx-text-dimmed);
+}
+
+.pvx-promo-card-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.pvx-promo-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.pvx-promo-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--pvx-text-primary);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pvx-promo-card-prize {
+  font-size: 0.875rem;
+  color: var(--pvx-text-muted);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pvx-promo-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: auto;
+  font-size: 0.75rem;
+  color: var(--pvx-text-dimmed);
+}
+
+/* ─── Badges ─── */
+
+.pvx-promo-status,
+.pvx-promo-type,
+.pvx-promo-game {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pvx-promo-status--upcoming {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
+
+.pvx-promo-status--open {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.pvx-promo-status--closed {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.pvx-promo-status--winners {
+  background: rgba(234, 179, 8, 0.25);
+  color: #facc15;
+}
+
+.pvx-promo-type {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
+
+.pvx-promo-game {
+  background: var(--pvx-tag-bg);
+  color: var(--pvx-tag-text);
+}
+
+/* ─── Detail view ─── */
+
+.pvx-promo-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.pvx-promo-back {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.875rem;
+  color: var(--pvx-text-muted);
+  cursor: pointer;
+}
+
+.pvx-promo-back:hover {
+  color: var(--pvx-accent);
+}
+
+.pvx-promo-detail-poster {
+  border-radius: var(--pvx-radius);
+  overflow: hidden;
+  background: #0d1117;
+}
+
+.pvx-promo-detail-poster img {
+  width: 100%;
+  max-height: 24rem;
+  object-fit: cover;
+  display: block;
+}
+
+.pvx-promo-detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pvx-promo-detail-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--pvx-text-primary);
+  margin: 0;
+}
+
+.pvx-promo-detail-prize {
+  font-size: 1rem;
+  color: var(--pvx-text-muted);
+  margin: 0;
+}
+
+.pvx-promo-detail-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  color: var(--pvx-text-dimmed);
+}
+
+.pvx-promo-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--pvx-text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.pvx-promo-section-count {
+  font-weight: 400;
+  color: var(--pvx-text-muted);
+}
+
+/* ─── Winners panel ─── */
+
+.pvx-promo-winners {
+  border-radius: var(--pvx-radius);
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  background: rgba(234, 179, 8, 0.06);
+  padding: 1rem;
+}
+
+.pvx-promo-winners-list {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.pvx-promo-winner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pvx-promo-winner-name {
+  font-weight: 600;
+  color: var(--pvx-text-primary);
+}
+
+/* ─── Entry action ─── */
+
+.pvx-promo-action {
+  border-radius: var(--pvx-radius);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-bg-card);
+  padding: 1rem;
+}
+
+.pvx-promo-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pvx-promo-action-note {
+  font-size: 0.9375rem;
+  color: var(--pvx-text-primary);
+  margin: 0;
+}
+
+.pvx-promo-disclosure {
+  font-size: 0.75rem;
+  color: var(--pvx-text-dimmed);
+  margin: 0.25rem 0 0;
+}
+
+.pvx-promo-error {
+  font-size: 0.8125rem;
+  color: #f87171;
+  margin: 0 0 0.25rem;
+}
+
+.pvx-promo-enter-btn,
+.pvx-promo-withdraw-btn,
+.pvx-promo-enter-link {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 150ms, opacity 150ms;
+  border: none;
+}
+
+.pvx-promo-enter-btn,
+.pvx-promo-enter-link {
+  background: var(--pvx-accent);
+  color: #fff;
+}
+
+.pvx-promo-enter-btn:hover:not(:disabled),
+.pvx-promo-enter-link:hover {
+  opacity: 0.9;
+}
+
+.pvx-promo-enter-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pvx-promo-withdraw-btn {
+  background: transparent;
+  border: 1px solid var(--pvx-border);
+  color: var(--pvx-text-muted);
+}
+
+.pvx-promo-withdraw-btn:hover:not(:disabled) {
+  border-color: #f87171;
+  color: #f87171;
+}
+
+/* ─── Description (markdown) ─── */
+
+.pvx-promo-description {
+  border-radius: var(--pvx-radius);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-bg-card);
+  padding: 1.25rem;
+  color: var(--pvx-text-primary);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.pvx-promo-description h1,
+.pvx-promo-description h2,
+.pvx-promo-description h3 {
+  color: var(--pvx-text-primary);
+  margin: 1rem 0 0.5rem;
+}
+
+.pvx-promo-description h1:first-child,
+.pvx-promo-description h2:first-child,
+.pvx-promo-description h3:first-child,
+.pvx-promo-description p:first-child {
+  margin-top: 0;
+}
+
+.pvx-promo-description p,
+.pvx-promo-description ul,
+.pvx-promo-description ol {
+  margin: 0.5rem 0;
+}
+
+.pvx-promo-description a {
+  color: var(--pvx-accent);
+}
+
+.pvx-promo-description code {
+  background: var(--pvx-tag-bg);
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.85em;
+}
+
+/* ─── Entrants grid ─── */
+
+.pvx-promo-entrants {
+  border-radius: var(--pvx-radius);
+  border: 1px solid var(--pvx-border);
+  background: var(--pvx-bg-card);
+  padding: 1.25rem;
+}
+
+.pvx-promo-entrants-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .pvx-promo-entrants-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .pvx-promo-entrants-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.pvx-promo-entrant {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.pvx-promo-entrant-name {
+  font-size: 0.875rem;
+  color: var(--pvx-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pvx-promo-avatar {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.pvx-promo-avatar--lg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.pvx-promo-avatar--placeholder {
+  background: var(--pvx-tag-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pvx-promo-avatar-glyph {
+  width: 55%;
+  height: 55%;
+  color: var(--pvx-text-dimmed);
+}
