@@ -1,6 +1,6 @@
 {
   "name": "@pitvox/partner-react",
-  "version": "0.7.23",
+  "version": "0.7.24",
   "description": "React hooks and styled components for PitVox partner websites — leaderboards, competitions, driver dashboards",
   "type": "module",
   "main": "dist/index.cjs",
