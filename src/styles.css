@@ -3163,7 +3163,7 @@
 
 .pvx-promo-disclosure {
   font-size: 0.75rem;
-  color: var(--pvx-text-dimmed);
+  color: var(--pvx-text-muted);
   margin: 0.25rem 0 0;
 }
 

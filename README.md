@@ -175,6 +175,112 @@ import {
 
 **`getCompetitionPodium(standings, topN?)`** — Extract the top N drivers from a standings payload.
 
+## Promotions
+
+Partner-run community promotions. The first (and currently only) type is `giveaway` — a one-click prize draw: drivers sign in with Steam, hit Enter, and the partner picks winners manually and publishes them. The `type` field is designed to grow (e.g. discount codes, free trials) without new hooks or components.
+
+Promotions are managed by the partner on pitvox.com; the SDK is the read + entry surface for partner sites. Public data (config, entrants, winners) comes from the CDN; entry/withdraw go through the same backend-proxy pattern as competition registration.
+
+### Drop-in composite (recommended)
+
+```jsx
+import { PromotionExplorer } from '@pitvox/partner-react'
+import '@pitvox/partner-react/styles.css'
+
+function GiveawaysPage() {
+  return <PromotionExplorer title="Giveaways" />
+}
+```
+
+`PromotionExplorer` is the whole experience in one component: a card grid that drills into a detail view (poster, markdown description, one-click entry with a public-display disclosure, live entrants grid, and the winners panel once announced). Selection lives in the `?promotion=` URL search param via the History API — links are shareable and the browser back button works — so it needs no router.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | `'Promotions'` | Page heading (pass `''` to hide it) |
+| `driverData` | `object` | — | Extra fields sent to the enter callback (e.g. `displayName`, `avatarUrl`); usually unnecessary since the backend derives identity from the Steam token |
+| `className` | `string` | — | Additional class on root container |
+
+### Hooks
+
+```jsx
+import {
+  usePromotions,
+  usePromotionConfig,
+  usePromotionEntryList,
+  usePromotionEntryStatus,
+} from '@pitvox/partner-react'
+```
+
+**`usePromotions()`** — All active promotions for this partner (or all promotions in global mode). The CDN index carries active promotions only, so an empty result means nothing is running — handy for conditionally showing a nav link.
+
+**`usePromotionConfig(promotionId, options?)`** — Single promotion config (title, prize, markdown description, entry window, winners).
+
+**`usePromotionEntryList(promotionId, options?)`** — Entrants (Steam ID, display name, avatar, entered-at). `null` until the first entry.
+
+**`usePromotionEntryStatus(promotionId)`** — Whether the current user (via `getSteamId`) has entered, plus the entry list. Lightweight CDN check.
+
+All detail hooks accept `options.partnerSlug` to override the provider's slug (useful in global mode).
+
+### Styled components
+
+```jsx
+import {
+  PromotionExplorer, PromotionCards, PromotionCard,
+  PromotionDetail, EnterButton,
+} from '@pitvox/partner-react'
+import '@pitvox/partner-react/styles.css'
+```
+
+- **`<PromotionExplorer>`** — The drop-in composite above.
+- **`<PromotionCards>`** — Card grid with posters, status/type badges, prize, entry window, and entry count. Adapts the layout to the card count (a lone promotion renders as one wide centred card). Props: `promotions`, `isLoading`, `onSelect`, `className`.
+- **`<PromotionCard>`** — Individual card, for when you want to control the grid yourself. Props: `promo`, `onSelect`.
+- **`<PromotionDetail>`** — Full detail view: poster, markdown body, entrants grid, the entry action with public-display disclosure, and the winners panel. Self-contained — fetches via hooks. Props: `promotionId`, `driverData`, `onBack` (omit to hide the back link), `className`.
+- **`<EnterButton>`** — Enter/withdraw toggle. Render-prop or default button, with the same basic/power-mode behaviour as `RegisterButton` (see below). Props: `promotionId`, `driverData`, `className`, `children` (render prop).
+
+### Entry modes
+
+Like registration, entry has two modes determined by whether you provide callbacks to the provider.
+
+**Basic mode (default)** — no configuration; `EnterButton` and the detail view render a link to pitvox.com where the user enters with Steam.
+
+**Power mode** — for partners with a backend proxying to pitvox-api (keeping the partner API key server-side), provide the callbacks. The Steam ID is derived server-side from the user's token, not from client input:
+
+```jsx
+<PitVoxPartnerProvider
+  partnerSlug="your-slug"
+  getSteamId={() => user?.steamId ?? null}
+  onEnterPromotion={async (promotionId, driverData) => {
+    // Call your backend (e.g. AppSync mutation) → pitvox-api
+    await client.graphql({ query: ENTER_PROMOTION, variables: { promotionId, ...driverData } })
+  }}
+  onWithdrawPromotionEntry={async (promotionId, steamId) => {
+    await client.graphql({ query: WITHDRAW_PROMOTION_ENTRY, variables: { promotionId } })
+  }}
+>
+```
+
+Entry/withdraw hooks for fully custom UIs:
+
+```jsx
+import { useEnterPromotion, useWithdrawPromotionEntry, usePromotionMode, usePromotionUrl } from '@pitvox/partner-react'
+```
+
+**`useEnterPromotion(promotionId)`** — Mutation delegating to `onEnterPromotion`, with optimistic entry-list updates.
+
+**`useWithdrawPromotionEntry(promotionId)`** — Mutation delegating to `onWithdrawPromotionEntry`. Withdrawals are only accepted while entries are open.
+
+**`usePromotionMode()`** — Returns `{ isPowerMode, isBasicMode }`.
+
+**`usePromotionUrl(promotionId)`** — pitvox.com promotion URL for basic mode.
+
+### Status helper
+
+```jsx
+import { getPromotionStatus, PROMOTION_STATUS_LABELS } from '@pitvox/partner-react'
+```
+
+**`getPromotionStatus(promotion, now?)`** — Returns `'upcoming'` | `'open'` | `'closed'` | `'winners'`, derived from the clock against `opensAt`/`closesAt` (the CDN never stores a computed open/closed flag, so files can't go stale between syncs). `PROMOTION_STATUS_LABELS` maps each to a display string.
+
 ## Driver Dashboard
 
 ### Drop-in composite
